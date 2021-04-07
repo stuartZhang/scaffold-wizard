@@ -1,0 +1,302 @@
+{
+    "prompts": {
+        "subprojects": {
+            "type": "checkbox",
+            "message": "请选择 工程类型",
+            "required": true,
+            "choices": [{
+                "name": "PC浏览器-管理界面",
+                "value": "admin",
+                "short": "中后台",
+                "checked": false
+            }, {
+                "name": "本地 H5 插件",
+                "value": "app",
+                "short": "移动插件",
+                "checked": false
+            }, {
+                "name": "组件/模块/微前端应用",
+                "value": "component",
+                "short": "组件/模块/微前端",
+                "checked": false
+            }, {
+                "name": "RUST 语言 WEB 字节码 NPM 模块",
+                "value": "wasm",
+                "short": "RUST + WASM + NPM",
+                "checked": false
+            }, {
+                "name": "RUST 语言原生 GUI 应用",
+                "value": "rust_gui",
+                "short": "RUST + GTK3 APP",
+                "checked": false
+            }]
+        },
+        "adminPort": {
+            "when": "subprojects.admin",
+            "type": "input",
+            "message": "请输入【管理端】webpack dev server 监听端口号",
+            "required": true,
+            "default": 9000
+        },
+        "appPort": {
+            "when": "subprojects.app",
+            "type": "input",
+            "message": "请输入 移动端 webpack dev server 监听端口号",
+            "required": true,
+            "default": 9010
+        },
+        "componentPort": {
+            "when": "subprojects.component",
+            "type": "input",
+            "message": "请输入 组件/模块开发 webpack dev server 监听端口号",
+            "required": true,
+            "default": 9015
+        },
+        // 组件库
+        "adminUiLib": {
+            "when": "subprojects.admin",
+            "type": "list",
+            "message": "请选择“管理端” UI 组件库",
+            "choices": [{
+                "name": "不使用UI组件库",
+                "value": "none",
+                "short": "无"
+            }, {
+                "name": "iView",
+                "value": "iView",
+                "short": "iView"
+            }, {
+                "name": "Element UI",
+                "value": "elementUI",
+                "short": "Element"
+            }]
+        },
+        "appUiLib": {
+            "when": "subprojects.app",
+            "type": "list",
+            "message": "请选择“移动端” UI 组件库",
+            "choices": [{
+                "name": "不使用UI组件库",
+                "value": "none",
+                "short": "无"
+            }, {
+                "name": "Vant",
+                "value": "vant",
+                "short": "vant"
+            }]
+        },
+        "compWhichEnd": {
+            "when": "subprojects.component",
+            "type": "list",
+            "message": "请选择“组件的目标”运行环境",
+            "default": 0,
+            "choices": [{
+                "name": "桌面浏览器",
+                "value": "pcBrowser",
+                "short": "桌面"
+            }, {
+                "name": "移动 WebView",
+                "value": "mobileBrowser",
+                "short": "移动"
+            }]
+        },
+        "compUiLib": {
+            "when": "subprojects.component",
+            "type": "list",
+            "message": "请选择 基于哪款【UI 组件库】做二次开发实现组件",
+            "choices": [{
+                "name": "不使用UI组件库",
+                "value": "none",
+                "short": "无"
+            }, {
+                "when": "compWhichEnd == 'pcBrowser'",
+                "name": "Element UI",
+                "value": "elementUI",
+                "short": "Element"
+            }, {
+                "when": "compWhichEnd == 'mobileBrowser'",
+                "name": "Vant",
+                "value": "vant",
+                "short": "vant"
+            }]
+        },
+        "favicon": {
+            "when": "subprojects.admin || subprojects.app",
+            "type": "confirm",
+            "message": "针对【管理端】与【移动端】，是否自己管理网页的 favicon 图标？",
+            "default": false
+        },
+        "adminMultiEntries": {
+            "when": "subprojects.admin",
+            "type": "list",
+            "message": "【管理端】是几页应用程序？",
+            "default": 0,
+            "choices": [{
+                "name": "单页",
+                "value": 1,
+                "short": "单"
+            }, {
+                "name": "双页",
+                "value": 2,
+                "short": "双"
+            }]
+        },
+        "appMultiEntries": {
+            "when": "subprojects.app",
+            "type": "list",
+            "message": "【移动端】是几页应用程序？",
+            "default": 0,
+            "choices": [{
+                "name": "单页",
+                "value": 1,
+                "short": "单"
+            }, {
+                "name": "双页",
+                "value": 2,
+                "short": "双"
+            }]
+        },
+        "flavor": {
+            "when": "!subprojects.wasm && !subprojects.rust_gui",
+            "type": "confirm",
+            "message": "是否支持 Flavor 选择器？",
+            "default": false
+        },
+        "adminAssetsSubDirectory": {
+            "when": "subprojects.admin",
+            "type": "list",
+            "message": "请选择-管理端-资源文件目录名",
+            "default": 0,
+            "choices": [{
+                "name": "bundle/admin",
+                "value": "bundle/admin",
+                "short": "bundle/admin"
+            }, {
+                "name": "static",
+                "value": "static",
+                "short": "static"
+            }]
+        },
+        "appAssetsSubDirectory": {
+            "when": "subprojects.app",
+            "type": "list",
+            "message": "请选择-移动端-资源文件目录名",
+            "default": 0,
+            "choices": [{
+                "name": "bundle/app",
+                "value": "bundle/app",
+                "short": "bundle/app"
+            }, {
+                "name": "static",
+                "value": "static",
+                "short": "static"
+            }]
+        },
+        "appWebWorker": {
+            "when": "subprojects.app",
+            "type": "confirm",
+            "message": "是否预置线程化 web worker 加速？",
+            "default": false
+        },
+        "adminI18n": {
+            "when": "subprojects.admin",
+            "type": "confirm",
+            "message": "是否预置 Vue 国际化？",
+            "default": false
+        },
+        "appI18n": {
+            "when": "subprojects.app",
+            "type": "confirm",
+            "message": "是否预置 Vue 国际化？",
+            "default": false
+        },
+        "imgCompress": {
+            "when": "!subprojects.wasm && !subprojects.rust_gui",
+            "type": "confirm",
+            "message": "是否预压缩各类图片？",
+            "default": false
+        },
+        "appPrerender": {
+            "when": "subprojects.app",
+            "type": "confirm",
+            "message": "【是/否】启动首屏预渲染模式？",
+            "default": false
+        },
+        "cssModules": {
+            "when": "subprojects.admin || subprojects.app",
+            "type": "confirm",
+            "message": "【是/否】启用 CSS 模块？",
+            "default": false
+        },
+        "adminType": {
+            "when": "subprojects.admin",
+            "type": "list",
+            "message": "请选择 工程子类型",
+            "default": 0,
+            "choices": [{
+                "name": "单体应用",
+                "value": "standalone",
+                "short": "常规"
+            }, {
+                "name": "微前端宿主",
+                "value": "microFrontEnd",
+                "short": "微前端"
+            }]
+        },
+        "appType": {
+            "when": "subprojects.app",
+            "type": "list",
+            "message": "请选择 工程子类型",
+            "default": 0,
+            "choices": [{
+                "name": "单体应用",
+                "value": "standalone",
+                "short": "常规"
+            }, {
+                "name": "微前端宿主",
+                "value": "microFrontEnd",
+                "short": "微前端"
+            }]
+        },
+        "compType": {
+            "when": "subprojects.component",
+            "type": "list",
+            "message": "请选择 工程子类型",
+            "default": 0,
+            "choices": [{
+                "name": "组件/模块",
+                "value": "module",
+                "short": "常规"
+            }, {
+                "name": "微前端应用",
+                "value": "microFrontEnd",
+                "short": "微前端"
+            }]
+        },
+        "adminPx2remTactic": {
+            "when": "subprojects.admin",
+            "type": "list",
+            "message": "px2rem 自适应布局策略",
+            "default": 1,
+            "choices": [{
+                "name": "放弃（没有设计稿，凭感觉度量）",
+                "value": "none",
+                "short": "放弃"
+            }, {
+                "name": "采用且以·设计稿宽度·为基准（对齐设计稿，制作常规网页）",
+                "value": "width",
+                "short": "常规网页制作"
+            }, {
+                "name": "采用且以·设计稿对角线长度·为基准（对齐设计稿，制作·限高·iframe）",
+                "value": "diagonal",
+                "short": "限高iframe制作"
+            }]
+        },
+        "installDepsImmediate": {
+            "when": "!subprojects.rust_gui",
+            "type": "confirm",
+            "message": "【是/否】是否立即给工程原型安装依赖？",
+            "default": true
+        }
+    }
+}
