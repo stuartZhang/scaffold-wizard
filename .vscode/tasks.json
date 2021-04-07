@@ -1,0 +1,175 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "check",
+        "command": "cargo",
+        "args": [
+            "check"
+        ],
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "isBackground": true,
+        "problemMatcher": {
+            "owner": "wasm-pack",
+            "background": {
+                "activeOnStart": true,
+                "beginsPattern": "Checking for the Wasm target\\.\\.\\.",
+                "endsPattern": "Your wasm pkg is ready to publish at"
+            },
+            "pattern": [{
+                "regexp": "^\\s*(\\S+)\\s*$",
+                "file": 1
+            }, {
+                "regexp": "^\\s+(\\d+):(\\d+)\\s+(\\S+)\\s+(.*)\\s\\s+(.*)\\s*$",
+                "line": 1,
+                "column": 2,
+                "severity": 3,
+                "message": 4,
+                "code": 5
+            }]
+        }
+    }, {
+        "label": "test",
+        "command": "cargo",
+        "args": [
+            "test",
+            "--",
+            "--nocapture"
+        ],
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        },
+        "group": {
+            "kind": "test",
+            "isDefault": true
+        },
+        "isBackground": true,
+        "problemMatcher": {
+            "owner": "wasm-pack",
+            "background": {
+                "activeOnStart": true,
+                "beginsPattern": "Checking for the Wasm target\\.\\.\\.",
+                "endsPattern": "Your wasm pkg is ready to publish at"
+            },
+            "pattern": [{
+                "regexp": "^\\s*(\\S+)\\s*$",
+                "file": 1
+            }, {
+                "regexp": "^\\s+(\\d+):(\\d+)\\s+(\\S+)\\s+(.*)\\s\\s+(.*)\\s*$",
+                "line": 1,
+                "column": 2,
+                "severity": 3,
+                "message": 4,
+                "code": 5
+            }]
+        }
+    }, {
+        "label": "build",
+        "command": "cargo",
+        "args": [
+            "build"
+        ],
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "isBackground": true,
+        "problemMatcher": {
+            "owner": "wasm-pack",
+            "background": {
+                "activeOnStart": true,
+                "beginsPattern": "Checking for the Wasm target\\.\\.\\.",
+                "endsPattern": "Your wasm pkg is ready to publish at"
+            },
+            "pattern": [{
+                "regexp": "^\\s*(\\S+)\\s*$",
+                "file": 1
+            }, {
+                "regexp": "^\\s+(\\d+):(\\d+)\\s+(\\S+)\\s+(.*)\\s\\s+(.*)\\s*$",
+                "line": 1,
+                "column": 2,
+                "severity": 3,
+                "message": 4,
+                "code": 5
+            }]
+        }
+    }, {
+        "label": "run",
+        "command": "cargo",
+        "args": [
+            "run"
+        ],
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "isBackground": true,
+        "problemMatcher": {
+            "owner": "wasm-pack",
+            "background": {
+                "activeOnStart": true,
+                "beginsPattern": "Checking for the Wasm target\\.\\.\\.",
+                "endsPattern": "Your wasm pkg is ready to publish at"
+            },
+            "pattern": [{
+                "regexp": "^\\s*(\\S+)\\s*$",
+                "file": 1
+            }, {
+                "regexp": "^\\s+(\\d+):(\\d+)\\s+(\\S+)\\s+(.*)\\s\\s+(.*)\\s*$",
+                "line": 1,
+                "column": 2,
+                "severity": 3,
+                "message": 4,
+                "code": 5
+            }]
+        }
+    }, {
+        "type": "shell",
+        "label": "cloud test",
+        "command": "cloud-rustc",
+        "args": [
+            "test",
+            "-bt",
+            "-e",
+            "\"${relativeFile}\""
+        ],
+        "problemMatcher": []
+    }]
+}

@@ -1,0 +1,11 @@
+[package]
+name = "scaffold-wizard"
+version = "0.0.1"
+authors = ["stuart_zhang <stuartpage@qq.com>"]
+edition = "2018"
+license = "MIT"
+description = "scaffold-wizard 图形界面应用程序"
+
+[dependencies]
+gtk = {version = "0.9.0", features = ["v3_16"]}
+gio = {version = "0", features = ["v2_44"]}
