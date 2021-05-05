@@ -17,9 +17,5 @@
     "rust-analyzer.inlayHints.parameterHints": false,
     "rust-analyzer.diagnostics.disabled": [
         "missing-unsafe"
-    ], // 不是 cargo check 的官方错误类型
-    "terminal.integrated.shellArgs.windows": [
-        "/k",
-        "chcp 65001"
-    ]
+    ] // 不是 cargo check 的官方错误类型
 }

@@ -5,17 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "GUI App",
+            "name": "GUI App Launch",
             "type": "lldb",
             "request": "launch",
             "cwd": "${workspaceRoot}",
-            "console": "integratedTerminal",
+            "console": "internalConsole",
             "sourceLanguages": ["rust"],
             "cargo": {
                 "args": [
                     "build"
                 ]
             }
+        },
+        {
+            "name": "GUI App Attach",
+            "type": "lldb",
+            "request": "attach",
+            "sourceLanguages": ["rust"],
+            "program": "${workspaceRoot}/target/debug/scaffold-wizard.exe",
+            "waitFor": true
         }
     ]
 }

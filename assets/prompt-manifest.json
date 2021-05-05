@@ -18,22 +18,26 @@
                 "name": "组件/模块/微前端应用",
                 "value": "component",
                 "short": "组件/模块/微前端",
-                "checked": false
+                "checked": false,
+                "mutex": true
             }, {
                 "name": "RUST 语言 WEB 字节码 NPM 模块",
                 "value": "wasm",
                 "short": "RUST + WASM + NPM",
-                "checked": false
+                "checked": false,
+                "mutex": true
             }, {
                 "name": "RUST 语言原生 GUI 应用",
                 "value": "rust_gui",
                 "short": "RUST + GTK3 APP",
-                "checked": false
+                "checked": false,
+                "mutex": true
             }]
         },
         "adminPort": {
             "when": "subprojects.admin",
             "type": "input",
+            "subType": "port",
             "message": "请输入【管理端】webpack dev server 监听端口号",
             "required": true,
             "default": 9000
@@ -41,6 +45,7 @@
         "appPort": {
             "when": "subprojects.app",
             "type": "input",
+            "subType": "port",
             "message": "请输入 移动端 webpack dev server 监听端口号",
             "required": true,
             "default": 9010
@@ -48,11 +53,11 @@
         "componentPort": {
             "when": "subprojects.component",
             "type": "input",
+            "subType": "port",
             "message": "请输入 组件/模块开发 webpack dev server 监听端口号",
             "required": true,
             "default": 9015
         },
-        // 组件库
         "adminUiLib": {
             "when": "subprojects.admin",
             "type": "list",
@@ -297,6 +302,18 @@
             "type": "confirm",
             "message": "【是/否】是否立即给工程原型安装依赖？",
             "default": true
+        },
+        "name": {
+            "type": "string",
+            "message": "工程名",
+            "required": true,
+            "default": "project_name"
+        },
+        "author": {
+            "type": "string",
+            "message": "作者名",
+            "required": true,
+            "default": "author_name"
         }
     }
 }

@@ -1,1 +1,6 @@
-/target
+target/
+*.ui~
+*.glade~
+src/window-test.glade
+logs/
+assets/answers.json

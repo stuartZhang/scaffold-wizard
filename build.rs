@@ -1,6 +1,16 @@
-use ::std::{env, fs, os, path::Path, process};
-#[cfg(windows)]
+use ::std::{env, fs, io::Result as IoResult, os, path::{Path, PathBuf}, process};
+const ASSETS_DIR_NAME: &str = "assets";
 fn main() {
+    let out_dir = env::var("OUT_DIR")
+        .expect("失败：环境变量`OUT_DIR`未提供");
+    println!("调试：OUT_DIR={}", out_dir);
+    let exe_dir = Path::new(&out_dir[..]).join("../../..").canonicalize()
+        .expect(&format!("失败：不能从 {} 推断出 exe 目录", out_dir)[..]);
+    symbolic_link_zlib1(&exe_dir);
+    symbolic_link_assets(&exe_dir);
+}
+#[cfg(windows)]
+fn symbolic_link_zlib1(exe_dir: &PathBuf) {
     let msys2_home = match env::var("MSYS2_HOME") {
         Ok(value) => value,
         Err(_) => {
@@ -9,21 +19,16 @@ fn main() {
         }
     };
     println!("调试：MSYS2_HOME={}", msys2_home);
-    let out_dir = env::var("OUT_DIR")
-        .expect("失败：环境变量`OUT_DIR`未提供");
-    println!("调试：OUT_DIR={}", out_dir);
-    let exe_dir = Path::new(&out_dir[..]).join("../../..").canonicalize()
-        .expect(&format!("失败：不能从 {} 推断出 exe 目录", out_dir)[..]);
     println!("调试：EXE_DIR={}", exe_dir.display());
     if !exe_dir.is_dir() {
         println!("cargo:warning={} 不是一个目录", exe_dir.display());
         process::exit(1);
     }
-    let zlib1_exe = exe_dir.join("zlib1.dll");
-    println!("调试：ZLIB1_EXE={}", zlib1_exe.display());
-    if zlib1_exe.exists() {
-        fs::remove_file(zlib1_exe.clone())
-            .expect(&format!("失败：不能删除原来的 {} 符号链接文件", zlib1_exe.display())[..]);
+    let zlib1_symbol = exe_dir.join("zlib1.dll");
+    println!("调试：ZLIB1_EXE={}", zlib1_symbol.display());
+    if zlib1_symbol.exists() {
+        fs::remove_file(zlib1_symbol.clone())
+            .expect(&format!("失败：不能删除原来的 {} 符号链接文件", zlib1_symbol.display())[..]);
     }
     let bits = if cfg!(target_pointer_width = "32") {
         32usize
@@ -38,13 +43,39 @@ fn main() {
         println!("cargo:warning={} 不是一个目录", bin_dir.display());
         process::exit(1);
     }
-    let zlib1_file = bin_dir.join("zlib1.dll");
-    println!("调试：ZLIB1_FILE={}", zlib1_file.display());
-    if !zlib1_file.is_file() {
-        println!("cargo:warning={} 不是一个文件", zlib1_file.display());
+    let zlib1_origin = bin_dir.join("zlib1.dll");
+    println!("调试：ZLIB1_FILE={}", zlib1_origin.display());
+    if !zlib1_origin.is_file() {
+        println!("cargo:warning={} 不是一个文件", zlib1_origin.display());
         process::exit(1);
     }
-    os::windows::fs::symlink_file(zlib1_file.clone(), zlib1_exe.clone())
-        .expect(&format!("失败：不能创建文件链接 {} 指向 {}", zlib1_exe.display(), zlib1_file.display())[..]);
-    println!("成功：能创建文件链接 {} 指向 {}", zlib1_exe.display(), zlib1_file.display());
+    os::windows::fs::symlink_file(zlib1_origin.clone(), zlib1_symbol.clone())
+        .expect(&format!("失败：不能创建文件链接 {} 指向 {}", zlib1_symbol.display(), zlib1_origin.display())[..]);
+    println!("成功：能创建文件链接 {} 指向 {}", zlib1_symbol.display(), zlib1_origin.display());
+}
+#[cfg(not(windows))]
+fn symbolic_link_zlib1(_: &PathBuf) {}
+fn symbolic_link_assets(exe_dir: &PathBuf) {
+    let mut assets_origin = env::current_dir().expect("工程里没有 assets 目录");
+    assets_origin.push(ASSETS_DIR_NAME);
+    let assets_symbol = exe_dir.join(ASSETS_DIR_NAME);
+    if assets_symbol.exists() {
+        fs::remove_dir(assets_symbol.clone())
+            .expect(&format!("失败：不能删除原来的 {} 符号链接文件", assets_symbol.display())[..]);
+    }
+    make_link(&assets_origin, &assets_symbol)
+        .expect(&format!("失败：不能创建文件链接 {} 指向 {}", assets_symbol.display(), assets_origin.display())[..]);
+    println!("成功：能创建目录链接 {} 指向 {}", assets_symbol.display(), assets_origin.display());
+    #[cfg(windows)]
+    fn make_link(assets_origin: &PathBuf, assets_symbol: &PathBuf) -> IoResult<()> {
+        os::windows::fs::symlink_dir(assets_origin.clone(), assets_symbol.clone())
+    }
+    #[cfg(unix)]
+    fn make_link(assets_origin: &PathBuf, assets_symbol: &PathBuf) -> IoResult<()> {
+        os::unix::fs::symlink(assets_origin.clone(), assets_symbol.clone())
+    }
+    #[cfg(linux)]
+    fn make_link(assets_origin: &PathBuf, assets_symbol: &PathBuf) -> IoResult<()> {
+        os::linux::fs::symlink(assets_origin.clone(), assets_symbol.clone())
+    }
 }

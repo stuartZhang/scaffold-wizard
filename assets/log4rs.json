@@ -1,0 +1,51 @@
+{
+    "refresh_rate": "5 seconds",
+    "appenders": {
+        "console": {
+            "encoder": {
+                "pattern": "[{d(%Y-%m-%d %H:%M:%S)(local)}][{h({l})}] {m:<30}\t[模块={M}][源文件={f}:{L}][线程={T}/{I}][进程={P}][Logger={t}]{n}"
+            },
+            "filters": [{
+                "kind": "threshold",
+                "level": "trace"
+            }],
+            "kind": "console"
+        },
+        "file": {
+            "append": true,
+            "encoder": {
+                "pattern": "[{d(%Y-%m-%d %H:%M:%S)(local)}][{h({l})}] {m:<30}\t[模块={M}][源文件={f}:{L}][线程={T}/{I}][进程={P}][Logger={t}]{n}"
+            },
+            "filters": [{
+                "kind": "threshold",
+                "level": "trace"
+            }],
+            "kind": "rolling_file",
+            "path": "logs/current.log",
+            "policy": {
+                "kind": "compound",
+                "trigger": {
+                    "kind": "size",
+                    "limit": "5mb"
+                },
+                "roller": {
+                    "base": 1,
+                    "count": 5,
+                    "kind": "fixed_window",
+                    "pattern": "logs/archive-{}.log.gz"
+                }
+            }
+        }
+    },
+    "root": {
+        "appenders": ["console"],
+        "level": "trace"
+    },
+    "loggers": {
+        "scaffold_wizard": {
+            "additive": true,
+            "appenders": ["file"],
+            "level": "trace"
+        }
+    }
+}
