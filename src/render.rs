@@ -18,7 +18,7 @@ use ::glib::{clone, Value as GtkValue};
 use ::gtk::{ApplicationWindow, Builder, Button, Frame, prelude::*};
 use ::log::debug;
 use ::serde_json::{map::Map, Value as jValue};
-use ::std::{cell::RefCell, rc::Rc};
+use ::std::{cell::RefCell, process, rc::Rc};
 pub use prompt_page::draw_page;
 //
 pub enum StepDirection {
@@ -122,7 +122,12 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
             None
         }))
     } else if handler_name == "on-btn-submit-click" {
-        Box::new(clone!(@weak window, @strong builder, @strong data => @default-return None, move |_| {
+        Box::new(clone!(@weak window => @default-return None, move |_| {
+            window.close();
+            None
+        }))
+    } else if handler_name == "on-window-delete" {
+        Box::new(clone!(@strong builder, @strong data => @default-return true.to_value(), move |_| {
             let answers = Rc::clone(&data.answers);
             let prompts = Rc::clone(&data.prompts);
             let answers_output = serde_json::to_string_pretty(&jValue::Object(answers.borrow().clone())).unwrap();
@@ -141,9 +146,9 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
                 error_dialog::show(&builder, &message[..]);
             } else {
                 super::write_json_file(&answers_output[..]).unwrap();
-                window.close();
+                process::exit(0);
             }
-            None
+            Some(true.to_value())
         }))
     } else {
         panic!("未被处理的组件事件 {}", handler_name)
