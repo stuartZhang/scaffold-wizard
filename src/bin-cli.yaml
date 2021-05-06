@@ -7,17 +7,17 @@ args:
         short: i
         long: input-file
         value_name: INPUT_FILE
-        help: 【问卷】的问题清单 json 文件。包括：题面，选项，默认值。默认输入文件是 assets/prompt-manifest.json
+        help: 【问卷】的问题清单 json 文件。包括：题面，选项，默认值。默认输入文件是 ../assets/prompt-manifest.json
         takes_value: true
     - output-file:
         short: o
         long: output-file
         value_name: OUTPUT_FILE
-        help: 【问卷】的答案清单 json 文件。默认输出文件是 assets/answers.json
+        help: 【问卷】的答案清单 json 文件。默认输出文件是 ../assets/answers.json
         takes_value: true
     - log4rs-file:
         short: l
         long: log4rs-file
         value_name: LOG_FILE
-        help: JSON 格式的 log4rs 配置文件。忽略此参数，程序会试从·（1）.exe 文件所在的同级目录（2）程序被执行的工作目录·寻找 assets/log4rs.json 文件。若两处都没有配置文件，程序日志功能将不会被开启。
+        help: JSON 格式的 log4rs 配置文件。忽略此参数，程序会试从·（1）.exe 文件所在的同级目录（2）程序被执行的工作目录·寻找 ../assets/log4rs.json 文件。若两处都没有配置文件，程序日志功能将不会被开启。
         takes_value: true

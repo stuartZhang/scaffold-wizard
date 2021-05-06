@@ -20,9 +20,9 @@
             },
             "args": [
                 "-i",
-                "assets/prompt-manifest.json",
+                "../assets/prompt-manifest.json",
                 "-o",
-                "assets/answers1.json"
+                "../assets/answers1.json"
             ]
         },
         {

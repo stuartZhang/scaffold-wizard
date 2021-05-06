@@ -1,10 +1,10 @@
 use ::gtk::{Align, Box as GtkBox, Label, Orientation, prelude::*};
 use ::log::debug;
 use ::serde_json::Value as jValue;
-use ::std::rc::Rc;
+use ::std::{path::Path, rc::Rc};
 use super::{Data, prompt_checkbox, prompt_input_port, prompt_input_text, prompt_radio, prompt_switch, StepDirection, StepTracer, Widgets};
 
-pub fn draw_page(widgets: Widgets, step_tracer: StepTracer, data: Rc<Data>) {
+pub fn draw_page(widgets: Widgets, step_tracer: StepTracer, data: Rc<Data>, bin_dir: Option<&Path>) {
     let answers = Rc::clone(&data.answers);
     let prompts = Rc::clone(&data.prompts);
     let (name, json) = loop {
@@ -58,7 +58,7 @@ pub fn draw_page(widgets: Widgets, step_tracer: StepTracer, data: Rc<Data>) {
             let spin_btn = prompt_input_port::build_ui((name, json), Rc::clone(&answers));
             v_outer_box.pack_start(&spin_btn, false, true, 0);
         } else {
-            let input_str = prompt_input_text::build_ui((name, json), Rc::clone(&answers));
+            let input_str = prompt_input_text::build_ui((name, json), Rc::clone(&answers), bin_dir);
             v_outer_box.pack_start(&input_str, false, true, 0);
         }
     } else if q_type == "confirm" {

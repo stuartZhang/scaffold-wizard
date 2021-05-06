@@ -19,7 +19,7 @@ use ::glib::{clone, Value as GtkValue};
 use ::gtk::{ApplicationWindow, Builder, Button, Frame, prelude::*};
 use ::log::debug;
 use ::serde_json::{map::Map, Value as jValue};
-use ::std::{cell::RefCell, rc::Rc};
+use ::std::{path::PathBuf, cell::RefCell, rc::Rc};
 pub use prompt_page::draw_page;
 //
 pub enum StepDirection {
@@ -69,7 +69,7 @@ pub struct Data {
 }
 pub fn connect_signals(builder: &Builder, handler_name: &str,
                        step_count: usize, step_index: Rc<RefCell<usize>>,
-                       data: Rc<Data>, answers_str: Rc<RefCell<String>>)
+                       data: Rc<Data>, answers_str: Rc<RefCell<String>>, bin_dir: Option<PathBuf>)
                        -> Box<dyn Fn(&[GtkValue]) -> Option<GtkValue> + 'static> {
     let window: ApplicationWindow = builder.get_object("outmost-window")
         .expect("不能从 glade 布局文件里，找到 outmost-window 元素");
@@ -80,7 +80,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
     let next_step_btn: Button = builder.get_object("btn-next-step")
         .expect("不能从 glade 布局文件里，找到 btn-next-step 元素");
     if handler_name == "on-btn-prev-click" {
-        Box::new(clone!(@weak prev_step_btn, @weak next_step_btn, @weak step_viewer, @strong step_index, @strong data => @default-return None, move |_| {
+        Box::new(clone!(@weak prev_step_btn, @weak next_step_btn, @weak step_viewer, @strong step_index, @strong data, @strong bin_dir => @default-return None, move |_| {
             {
                 let mut step_index = step_index.borrow_mut();
                 if *step_index > 0 {
@@ -95,7 +95,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
                 step_index: Rc::clone(&step_index),
                 step_count,
                 direction: StepDirection::BACKWARD
-            }, Rc::clone(&data));
+            }, Rc::clone(&data), bin_dir.as_deref());
             None
         }))
     } else if handler_name == "on-btn-next-click" {
@@ -119,7 +119,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
                 step_index: Rc::clone(&step_index),
                 step_count,
                 direction: StepDirection::FORWARD
-            }, Rc::clone(&data));
+            }, Rc::clone(&data), bin_dir.as_deref());
             None
         }))
     } else if handler_name == "on-btn-submit-click" {

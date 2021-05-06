@@ -4,10 +4,16 @@ fn main() {
     let out_dir = env::var("OUT_DIR")
         .expect("失败：环境变量`OUT_DIR`未提供");
     println!("调试：OUT_DIR={}", out_dir);
-    ["../../..", "../../../deps"].iter().for_each(|dir_path| {
+    let work_dir = vec!["../../..", "../../../deps"];
+    work_dir.iter().for_each(|dir_path| {
         let exe_dir = Path::new(&out_dir[..]).join(dir_path).canonicalize()
-            .expect(&format!("失败：不能从 {} 推断出 exe 目录", out_dir)[..]);
+            .expect(&format!("失败：不能从 {} 推断出 {} 目录", out_dir, dir_path)[..]);
         symbolic_link_zlib1(&exe_dir);
+    });
+    let work_dir = vec!["../../../..", "../../.."];
+    work_dir.iter().for_each(|dir_path| {
+        let exe_dir = Path::new(&out_dir[..]).join(dir_path).canonicalize()
+            .expect(&format!("失败：不能从 {} 推断出 {} 目录", out_dir, dir_path)[..]);
         symbolic_link_assets(&exe_dir);
     });
 }

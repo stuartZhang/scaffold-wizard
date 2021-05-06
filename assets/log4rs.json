@@ -21,7 +21,7 @@
                 "level": "trace"
             }],
             "kind": "rolling_file",
-            "path": "logs/current.log",
+            "path": "$ENV{INSTALL_HOME_DIR}/logs/current.log",
             "policy": {
                 "kind": "compound",
                 "trigger": {
