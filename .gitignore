@@ -3,4 +3,6 @@ target/
 *.glade~
 src/window-test.glade
 logs/
+node_modules/
 assets/answers.json
+assets/answers1.json

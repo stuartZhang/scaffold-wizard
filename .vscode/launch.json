@@ -12,10 +12,18 @@
             "console": "internalConsole",
             "sourceLanguages": ["rust"],
             "cargo": {
-                "args": [
-                    "build"
-                ]
-            }
+                "args": ["build"],
+                "filter": {
+                    "name": "scaffold-wizard",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "-i",
+                "assets/prompt-manifest.json",
+                "-o",
+                "assets/answers1.json"
+            ]
         },
         {
             "name": "GUI App Attach",

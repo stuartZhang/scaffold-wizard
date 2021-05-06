@@ -1,0 +1,22 @@
+{
+  "subprojects": {
+    "admin": false,
+    "app": true,
+    "component": false,
+    "wasm": false,
+    "rust_gui": false
+  },
+  "appPort": 9010,
+  "appUiLib": "vant",
+  "favicon": true,
+  "appMultiEntries": 2,
+  "appAssetsSubDirectory": "static",
+  "appWebWorker": true,
+  "appI18n": true,
+  "appPrerender": true,
+  "cssModules": true,
+  "appType": "standalone",
+  "installDepsImmediate": true,
+  "name": "project_name",
+  "author": "author_name"
+}

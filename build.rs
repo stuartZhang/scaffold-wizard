@@ -4,10 +4,12 @@ fn main() {
     let out_dir = env::var("OUT_DIR")
         .expect("失败：环境变量`OUT_DIR`未提供");
     println!("调试：OUT_DIR={}", out_dir);
-    let exe_dir = Path::new(&out_dir[..]).join("../../..").canonicalize()
-        .expect(&format!("失败：不能从 {} 推断出 exe 目录", out_dir)[..]);
-    symbolic_link_zlib1(&exe_dir);
-    symbolic_link_assets(&exe_dir);
+    ["../../..", "../../../deps"].iter().for_each(|dir_path| {
+        let exe_dir = Path::new(&out_dir[..]).join(dir_path).canonicalize()
+            .expect(&format!("失败：不能从 {} 推断出 exe 目录", out_dir)[..]);
+        symbolic_link_zlib1(&exe_dir);
+        symbolic_link_assets(&exe_dir);
+    });
 }
 #[cfg(windows)]
 fn symbolic_link_zlib1(exe_dir: &PathBuf) {

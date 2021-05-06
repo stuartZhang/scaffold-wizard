@@ -1,0 +1,17 @@
+name: 前端脚手架安装向导
+version: "1.0"
+author: 张浩予 <stuartpage@qq.com>
+about: 以【问卷】的形式，收集开发者对前端工程原型的“裁剪”条件信息
+args:
+    - input-file:
+        short: i
+        long: input-file
+        value_name: INPUT_FILE
+        help: 【问卷】的问题清单 json 文件。包括：题面，选项，默认值。默认输入文件是 assets/prompt-manifest.json
+        takes_value: true
+    - output-file:
+        short: o
+        long: output-file
+        value_name: OUTPUT_FILE
+        help: 【问卷】的答案清单 json 文件。默认输出文件是 assets/answers.json
+        takes_value: true

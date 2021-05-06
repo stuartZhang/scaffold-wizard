@@ -6,9 +6,19 @@ edition = "2018"
 license = "MIT"
 description = "scaffold-wizard 图形界面应用程序"
 
+[lib]
+crate-type = ["cdylib"]
+name = "scaffold_wizard"
+path = "src/lib.rs"
+
+[[bin]]
+name = "scaffold-wizard"
+path = "src/bin.rs"
+
 [features]
 
 [dependencies]
+clap = {version = "2.33.3", features = ["yaml"]}
 eval = "^0.4"
 gio = {version = "0", features = ["v2_44"]}
 glib = "0.10.3"

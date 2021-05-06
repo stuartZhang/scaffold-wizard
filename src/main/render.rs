@@ -14,11 +14,12 @@ mod prompt_page;
 mod error_dialog;
 //
 use ::eval::{Expr, Value as eValue};
+use ::gio::ApplicationExt;
 use ::glib::{clone, Value as GtkValue};
 use ::gtk::{ApplicationWindow, Builder, Button, Frame, prelude::*};
 use ::log::debug;
 use ::serde_json::{map::Map, Value as jValue};
-use ::std::{cell::RefCell, process, rc::Rc};
+use ::std::{cell::RefCell, rc::Rc};
 pub use prompt_page::draw_page;
 //
 pub enum StepDirection {
@@ -68,7 +69,7 @@ pub struct Data {
 }
 pub fn connect_signals(builder: &Builder, handler_name: &str,
                        step_count: usize, step_index: Rc<RefCell<usize>>,
-                       data: Rc<Data>)
+                       data: Rc<Data>, answers_str: Rc<RefCell<String>>)
                        -> Box<dyn Fn(&[GtkValue]) -> Option<GtkValue> + 'static> {
     let window: ApplicationWindow = builder.get_object("outmost-window")
         .expect("不能从 glade 布局文件里，找到 outmost-window 元素");
@@ -127,7 +128,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
             None
         }))
     } else if handler_name == "on-window-delete" {
-        Box::new(clone!(@strong builder, @strong data => @default-return true.to_value(), move |_| {
+        Box::new(clone!(@strong window, @strong builder, @strong data, @strong answers_str => @default-return true.to_value(), move |_| {
             let answers = Rc::clone(&data.answers);
             let prompts = Rc::clone(&data.prompts);
             let answers_output = serde_json::to_string_pretty(&jValue::Object(answers.borrow().clone())).unwrap();
@@ -145,8 +146,12 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
                 debug!("表单验证失败消息：{}", message);
                 error_dialog::show(&builder, &message[..]);
             } else {
-                super::write_json_file(&answers_output[..]).unwrap();
-                process::exit(0);
+                let mut answers_str = answers_str.borrow_mut();
+                answers_str.clear();
+                answers_str.push_str(&answers_output[..]);
+                if let Some(application) = window.get_application() {
+                    application.quit();
+                }
             }
             Some(true.to_value())
         }))
