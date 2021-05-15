@@ -10,8 +10,9 @@ fn main() -> Result<()> {
     let matches = App::from_yaml(yaml).get_matches();
     let input_file = matches.value_of("input-file").unwrap_or("assets/prompt-manifest.json");
     let output_file = matches.value_of("output-file").unwrap_or("assets/answers.json");
+    let log4rs_file = matches.value_of("log4rs-file");
     // 初始化日志系统
-    main::initialize_log4rs()?;
+    main::initialize_log4rs(log4rs_file)?;
     // 拼接输入与输出文件路径
     let (input_file, output_dir) = main::find_input_file(input_file)?;
     let output_file = main::find_output_file(output_file, &output_dir);

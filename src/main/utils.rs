@@ -43,9 +43,13 @@ pub fn find_output_file(output_file: &str, output_dir: &PathBuf) -> PathBuf {
     output_dir.push(output_file);
     output_dir
 }
-pub fn initialize_log4rs() -> Result<()> {
-    let (log4rs_file, _) = find_input_file("assets/log4rs.json")?;
-    log4rs::init_file(log4rs_file, Default::default())?;
-    debug!("初始化 log4rs 成功");
+pub fn initialize_log4rs(log4rs_file: Option<&str>) -> Result<()> {
+    let log4rs_file = log4rs_file.unwrap_or("assets/log4rs.json");
+    if let Ok((log4rs_file, _)) = find_input_file(log4rs_file) {
+        log4rs::init_file(log4rs_file.clone(), Default::default())?;
+        debug!("成功载入 log4rs 配置文件“{}”，已开启日志功能", log4rs_file.display());
+    } else {
+        println!("[WARN]不能找到 log4rs 配置文件“{}”，所以日志没有被开启", log4rs_file);
+    }
     Ok(())
 }

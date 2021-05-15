@@ -3,11 +3,13 @@ mod main;
 use ::std::{ffi::CString, os::raw::c_char};
 
 #[no_mangle]
-pub extern fn inquire(questions: *const c_char) -> *const c_char {
+pub extern fn inquire(questions: *const c_char, log4rs_file: *const c_char) -> *const c_char {
     let questions = unsafe {CString::from_raw(questions as *mut i8)}.into_string()
         .expect("解析输入字符串错误");
+    let log4rs_file = unsafe {CString::from_raw(log4rs_file as *mut i8)}.into_string();
+    let log4rs_file = log4rs_file.as_deref().ok();
     // 初始化日志系统
-    main::initialize_log4rs().expect("log4rs初始化失败");
+    main::initialize_log4rs(log4rs_file).expect("log4rs初始化失败");
     // 收集答案
     let answers = main::main(questions);
     CString::new(answers).expect("打包输出字符串错误").into_raw()
@@ -26,7 +28,7 @@ mod test {
         let questions = fs::read_to_string(input_file).unwrap();
         let questions = CString::new(questions).unwrap();
         // 收集答案
-        let answers = super::inquire(questions.into_raw());
+        let answers = super::inquire(questions.into_raw(), "".as_ptr() as *const c_char);
         let answers = unsafe {CString::from_raw(answers as *mut c_char)}.into_string().unwrap();
         // 读入【问卷】的输出文件
         let output_file = main::find_output_file(output_file, &output_dir);
