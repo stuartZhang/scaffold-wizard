@@ -1,4 +1,5 @@
 #![feature(option_insert)]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod main;
 
 use ::clap::{App, load_yaml};
