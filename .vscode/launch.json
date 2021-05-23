@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "GUI App Launch",
+            "name": "提供输入文件",
             "type": "lldb",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -22,7 +22,26 @@
                 "-i",
                 "../assets/prompt-manifest.json",
                 "-o",
-                "../assets/answers1.json"
+                "answers1.json"
+            ]
+        },
+        {
+            "name": "未提供输入文件",
+            "type": "lldb",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "console": "internalConsole",
+            "sourceLanguages": ["rust"],
+            "cargo": {
+                "args": ["build"],
+                "filter": {
+                    "name": "scaffold-wizard",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "-o",
+                "answers1.json"
             ]
         },
         {

@@ -1,6 +1,8 @@
+#![feature(option_insert)]
 mod main;
 
-use ::std::{ffi::CString, os::raw::c_char, path::PathBuf};
+use ::std::{ffi::CString, os::raw::c_char, path::PathBuf, ptr};
+use main::QuestionsInput;
 
 #[no_mangle]
 pub extern fn inquire(questions: *const c_char, bin_dir: *const c_char, log4rs_file: *const c_char) -> *const c_char {
@@ -15,13 +17,16 @@ pub extern fn inquire(questions: *const c_char, bin_dir: *const c_char, log4rs_f
         main::initialize_log4rs(log4rs_file, Some(bin_dir.as_path())).expect("log4rs初始化失败");
     }
     // 收集答案
-    let answers = main::main(questions, Some(bin_dir));
-    CString::new(answers).expect("打包输出字符串错误").into_raw()
+    if let (_, Some(answers)) = main::main(QuestionsInput::FileText(questions), Some(bin_dir)) {
+        // 写入【问卷】的输出文件
+        return CString::new(answers).expect("打包输出字符串错误").into_raw();
+    }
+    ptr::null()
 }
 #[cfg(test)]
 mod test {
-    use ::std::{env, fs, path::Path, ptr};
-    use super::{c_char, CString, main};
+    use ::std::{env, fs, path::Path};
+    use super::{c_char, CString, main, ptr};
     #[test]
     fn test() {
         let input_file = "../assets/prompt-manifest.json";

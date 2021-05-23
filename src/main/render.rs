@@ -69,7 +69,7 @@ pub struct Data {
 }
 pub fn connect_signals(builder: &Builder, handler_name: &str,
                        step_count: usize, step_index: Rc<RefCell<usize>>,
-                       data: Rc<Data>, answers_str: Rc<RefCell<String>>, bin_dir: Option<PathBuf>)
+                       data: Rc<Data>, answers_str: Rc<RefCell<Option<String>>>, bin_dir: Rc<Option<PathBuf>>)
                        -> Box<dyn Fn(&[GtkValue]) -> Option<GtkValue> + 'static> {
     let window: ApplicationWindow = builder.get_object("outmost-window")
         .expect("不能从 glade 布局文件里，找到 outmost-window 元素");
@@ -147,8 +147,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
                 error_dialog::show(&builder, &message[..]);
             } else {
                 let mut answers_str = answers_str.borrow_mut();
-                answers_str.clear();
-                answers_str.push_str(&answers_output[..]);
+                answers_str.insert(answers_output);
                 if let Some(application) = window.get_application() {
                     application.quit();
                 }
