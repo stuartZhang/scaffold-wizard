@@ -62,7 +62,7 @@
 
 ### 开发环境搭建
 
-不熟悉`rust + gtk + win32`技术栈的小伙伴儿请移步我的另一篇技术分享![为 Rust 原生 gui 编程，搭建 win32 开发环境](https://rustcc.cn/article?id=30291979-61e0-422d-9084-37d7d9eea2a1)。
+不熟悉`rust + gtk + win32`技术栈的小伙伴儿请移步我的另一篇技术分享！[为 Rust 原生 gui 编程，搭建 win32 开发环境](https://rustcc.cn/article?id=30291979-61e0-422d-9084-37d7d9eea2a1)。
 
 #### `rustup`工具链版本
 
