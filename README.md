@@ -315,12 +315,21 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
 
 1. 双击`target\setup-bin\bin\scaffold-wizard.exe`
 2. 直接弹出【文件选择对话框】，默认打开`target\setup-bin\assets`文件夹，要求你选择一个【问卷配置】`json`文件。
-3. 选择`prompt-manifest.json`文件，点击【打开】按钮。![image](https://user-images.githubusercontent.com/13935927/119863250-f3488280-bf4b-11eb-9697-58edf1127b6e.png)
-4. 开始回答问题。![image](https://user-images.githubusercontent.com/13935927/119863392-14a96e80-bf4c-11eb-986e-ed05ec7b6b62.png)
-5. 期间，不能退出。![image](https://user-images.githubusercontent.com/13935927/119863511-37d41e00-bf4c-11eb-97e8-37b5dd763983.png)
+3. 选择`prompt-manifest.json`文件，点击【打开】按钮。
+
+   ![image](https://user-images.githubusercontent.com/13935927/119863250-f3488280-bf4b-11eb-9697-58edf1127b6e.png)
+
+4. 开始回答问题。
+
+   ![image](https://user-images.githubusercontent.com/13935927/119863392-14a96e80-bf4c-11eb-986e-ed05ec7b6b62.png)
+
+5. 期间，不能退出。
+
+   ![image](https://user-images.githubusercontent.com/13935927/119863511-37d41e00-bf4c-11eb-97e8-37b5dd763983.png)
+
 6. 完成所有问题之后，点击【完成】按钮。
 7. 程序退出。
-8. 【回答结果】`json`文件被输出到和输入文件相同的目录下，文件名为`answers.json`。
+8.  【回答结果】`json`文件被输出到和输入文件相同的目录下，文件名为`answers.json`。
 
 > 我已经在`windows 10x64`与`windows 7x64`亲自验证过了。
 
