@@ -45,10 +45,11 @@
   * 解析命令行参数`input-file`，`output-file`，`log4rs-file`
   * 用法还算是高级，给`clap`写`yaml`配置文件，而不是在代码里攒【解析树】。
 * [eval](https://crates.io/crates/eval)
-  * 在运行时，根据上下文，求值【问卷配置】中`when`表达式。其表达式求值的功能真像`javascript`里的`eval`，但没那么强大。**我也绝不想在这个小工具里集成一个`JavascriptCore`引擎。**
+  * 在运行时，根据上下文，求值【问卷配置】中`when`表达式。其表达式求值的功能真像`javascript`里的`eval`函数，但没那么强大。**我也绝不想在这个小工具里集成一个`JavascriptCore`引擎。**
   * `when`表达式的求值结果决定了一个【问题】是否出现在图形界面的交互流程内。
 * [log](https://crates.io/crates/log)与[log4rs](https://crates.io/crates/log4rs)
   * 日志记录
+  * 大家对`log4**`家族里的其他成员一定很熟悉。比如，`log4j`与`log4js`。
 * [quick-xml](https://crates.io/crates/quick-xml)
   * 解析`SGML`格式的`Glade`布局文件。将布局文件内，对外部资源（主要是图片）的相对引用地址都改成运行时计算得出的绝对路径。这样，无论你以何种方式启动`.exe`文件，被引用的外部文件都能够被正确地找到了。
 * [serde_json](https://crates.io/crates/serde_json)
