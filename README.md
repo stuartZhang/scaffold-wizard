@@ -1,6 +1,6 @@
 # scaffold-wizard
 
-这是一款加持了【图形用户界面】的[inquirer](https://www.npmjs.com/package/inquirer)（名曰：**问卷**）。即，根据【问卷】配置文件，以人-机交互的形式，收集终端用户的【回答结果】。这里提到的【问卷配置】与【回答结果】都是`*.json`格式的字符串（或文件）。
+这是一款加持了【图形用户界面】的[npm - inquirer](https://www.npmjs.com/package/inquirer)（名曰：**问卷**）。即，根据【问卷】配置文件，以人-机交互的形式，收集终端用户的【回答结果】。这里提到的【问卷配置】与【回答结果】都是`*.json`格式的字符串（或文件）。
 
 【问卷】既能够作为`.exe`文件被双击运行，也支持作为`.dll`文件被链接和调用-间接运行。
 
@@ -18,22 +18,22 @@
 * 其次，最好能将【安装向导】改造成为一个“原生`GUI`平台”，从而在未来添加更多辅助功能。
 * 最终，成为公司技术工具链中重要的一环 --- 目标远大，征程漫长。
 
-后来，我越做这款工具，越是觉得它的·通用性·还是比较高的。其使用场景不应仅只局限于【脚手架-安装过程】的现场配置收集。相反，任何含有【意见咨询】类功能的使用场景都可以考虑使用这款（或这类）工具。然后，工具链的后续处理环节，再根据被收集的反馈结果，做定制化的“裁剪”。比如，“裁剪”脚手架内置的工程原型，使其更符合项目要求。
+后来，我越做这款工具，越是觉得它的·通用性·还是比较高的。其使用场景不应仅只局限于【脚手架-安装过程】的现场配置收集。相反，任何含有【意见咨询】类功能的使用场景都可以考虑使用这款（或这类）工具。而，工具链的后续处理环节，再根据被收集的反馈结果，做定制化的“裁剪”。比如，“裁剪”脚手架内置的工程原型，使其更符合项目要求。
 
-于是，我将这款工具从“脚手架-安装向导”更名为“问卷”。同时，它“下一步”再“下一步”的使用风格真心地像传统的`windows`系应用软件的【安装向导】。【情怀】--- 在我认知体系中的任何软件安装都应该是“下一步”再“下一步”...最后“完成”；步骤越多，越有仪式感。
+于是，我将这款工具从“脚手架-安装向导”更名为“问卷”。同时，它“下一步”再“下一步”的使用风格真心地相像于传统的`windows`应用软件的【安装向导】。【情怀】--- 在我认知体系中的任何软件安装都应该是“下一步”再“下一步”...最后“完成”；并且，其步骤越多，越有仪式感。
 
 另一方面，在【`rust`桌面应用】方向投入更多业余精力也符合我个人对掌握`rust`技术栈的成长规划。即，
 
 * 从`rust + wasm`入门。作为入门，这个“接入端”算是门槛比较低的了。
-* 在`rust`桌面编程领域进阶。毕竟，`wasm`是一个受限的应用场景，许多`rust`高级语言特性，还有`rust`生态一多半的`crate`都没有用武之地。这严重地限制了我对`rust`理解与掌握的层次。
+* 在`rust`桌面编程领域进阶。毕竟，`wasm`是一个受限的平台，许多`rust`高级语言特性，还有`rust`生态一多半的`crate`都没有用武之地。这严重地制约了我对`rust`理解与掌握的层次。
 * 最后我的愿景是：在`IoT`嵌入式设备上“开花结果”。这对`rust`技术栈本身来说真不是问题。它已经一次又一次地证明其实力。愿景的实现主要还是看我对`rust`的掌握能够达到什么水平。
 
-即便我已经是一名懒惰的程序员，那我也得掌握两个计算机语言
+另外，即便已经是一名懒惰的程序员，那我也得掌握两个计算机语言
 
 * `GC`类精通一门（一般说是“高级计算机语言”）
 * 非`GC`类掌握一门（通常认为是“系统计算机语言”）
 
-前者的破局点在铺得面广`+`无处不在，解决“温饱”问题；后者的立足点是足够地快`+`内存安全，解决“小康”问题。我要是能达到这个目标，那可真是：“中年危机远离我”。
+前者中佼佼者䊨在：“铺得面广`+`无处不在”，解决“温饱”问题；后者中“剩者”的立足点是：“足够地快`+`内存安全”，解决“小康”问题。**我要是能达到这个目标，那可真是：“中年危机远离我”。**
 
 ## 技术
 
@@ -45,29 +45,30 @@
   * 解析命令行参数`input-file`，`output-file`，`log4rs-file`
   * 用法还算是高级，给`clap`写`yaml`配置文件，而不是在代码里攒【解析树】。
 * [eval](https://crates.io/crates/eval)
-  * 在运行时，根据上下文，求值【问卷配置】中`when`表达式。其表达式求值的功能真像`javascript`里的`eval`函数，但没那么强大。**我也绝不想在这个小工具里集成一个`JavascriptCore`引擎。**
+  * 在运行时，根据上下文，求值【问卷配置】中`when`表达式。“给表达式求值”的功能真像`javascript`里的`eval`函数，但没那么强大。**我也绝不想在这个小工具里集成一个`JavascriptCore`引擎。实在太重了**
   * `when`表达式的求值结果决定了一个【问题】是否出现在图形界面的交互流程内。
 * [log](https://crates.io/crates/log)与[log4rs](https://crates.io/crates/log4rs)
   * 日志记录
   * 大家对`log4**`家族里的其他成员一定很熟悉。比如，`log4j`与`log4js`。
 * [quick-xml](https://crates.io/crates/quick-xml)
-  * 解析`SGML`格式的`Glade`布局文件。将布局文件内，对外部资源（主要是图片）的相对引用地址都改成运行时计算得出的绝对路径。这样，无论你以何种方式启动`.exe`文件，被引用的外部文件都能够被正确地找到了。
+  * 解析`SGML`格式的`Glade`布局文件。将布局文件内，对外部资源（主要是图片）的相对引用地址都改成运行时计算得出的绝对路径。这样，无论你以何种方式启动`.exe`文件，被引用的外部文件都能够被正确地找到。
 * [serde_json](https://crates.io/crates/serde_json)
   * 解析与输出`JSON`格式的【问卷配置】输入内容与【回答结果】输出内容。
 * [gdk-pixbuf](https://crates.io/crates/gdk-pixbuf), [gio](https://crates.io/crates/gio), [glib](https://crates.io/crates/glib), [gtk](https://crates.io/crates/gtk)
-  * 这些都是`Gnome`.`gtk`的`rust binding`。其功能可类似于`C`里的【头文件】。
+  * 这些都是`Gnome`.`gtk3`的`rust binding`。其功能可类似于`C`里的【头文件】。
 
-> 毕竟，【问卷】功能单一，所以用到的第三方依赖项不多。
-
-此外，在类`Linux`操作系统上，需要`Gnome`的`GtK`版本`>= 3.24`。另一方面，在`windows`操作系统上，绿色安装包需要自带`gtk`动态链接库与资源文件的“家什儿”。
+> 毕竟，【问卷】功能单一，所以用到的第三方依赖项不多。此外，
+>
+> * 在类`Linux`操作系统上，需要`Gnome`的`GtK`版本`>= 3.24`。
+> * 在`windows`操作系统上，绿色安装包需要自带`gtk`动态链接库与资源文件的“家什儿”。
 
 ### 开发环境搭建
 
-不熟悉`rust + gtk + win32`技术栈的小伙伴儿请移步我的另一篇技术分享！[为 Rust 原生 gui 编程，搭建 win32 开发环境](https://rustcc.cn/article?id=30291979-61e0-422d-9084-37d7d9eea2a1)。
+不熟悉`rust + gtk + win32`技术栈的小伙伴儿请移步我的另一篇技术分享：[为 Rust 原生 gui 编程，搭建 win32 开发环境](https://rustcc.cn/article?id=30291979-61e0-422d-9084-37d7d9eea2a1)。
 
 #### `rustup`工具链版本
 
-鉴于之前`rust + wasm`开发的踩坑经验，我这次已经将`package`绑定了适用的`rustup`版本`nightly-2021-03-25-x86_64-pc-windows-gnu`。若你的本地`rustup`安装版本与之不匹配，请根据提示`rustup install ***`之。就开发环境而言，对非`windows`用户不友好了，实在对不住。
+鉴于之前使用`rust + wasm`完成【网络加密通讯】功能的踩坑经验，我这次显示地将`package`绑定了适用的`rustup`版本`nightly-2021-03-25-x86_64-pc-windows-gnu`。若你的本地`rustup`安装版本与之不匹配，请根据编译的报错信息，`rustup install ***`正确的`rustup toolchain`版本。就开发环境而言，对非`windows`用户不友好了，实在对不住。
 
 ### 构建
 
@@ -76,9 +77,10 @@
 输出两个关键结果
 
 * `bin`的`target\debug\scaffold-wizard.exe` --- 可执行文件
-* `lib`的`target\debug\scaffold_wizard.dll` --- `C`动态链接库`cdylib`。注意：不是默认的`rust`动态链接库`dylib`
+* `lib`的`target\debug\scaffold_wizard.dll` --- `C`动态链接库`cdylib`。
+  * 注意：不是默认的`rust`动态链接库`dylib`。在编译期间，它幼稚地试图将所有被链接到`DLL`文件都静态编译入一个结果`DLL`文件内。这“理想主义”作法直接造成了单个`DLL`导出`public ABI`数量超出上限的编译错误。
 
-这是因为这个`package`是`cargo new --bin`与`cargo new --lib`的混合体。
+`scaffold-wizard`是`cargo new --bin`与`cargo new --lib`的混合体。
 
 #### `cargo test`
 
@@ -86,8 +88,8 @@
 
 #### `cargo run`
 
-* 编译`rust`源码
-* 在`msys2`包管理器的环境下，执行由进一步输出的`scaffold-wizard.exe`文件。
+* 编译`rust`源码，和输出`target\debug\scaffold-wizard.exe`
+* 在`msys2`包管理器的环境下，运行`target\debug\scaffold-wizard.exe`。
 
 #### `node build.js`或`node build.js --release`
 
@@ -107,7 +109,7 @@
 │  └─ icons
 ├─ assets
 │  ├─ prompt-manifest.json # 【问卷配置】样板文件
-│  ├─ log4rs.json          # 日志输出的配置文件
+│  ├─ log4rs.json          # 日志配置文件
 │  └─ images               # 自定义组件的图片
 └─ logs   # 运行时滚动日志输出目录。
 ```
@@ -121,14 +123,16 @@ node build.js
 
 上面的命令执行之后，其会在`target`目录下，创建两个子文件夹和两个`zip`文件
 
-* `setup-bin`和`scaffold-wizard.setup-bin.zip`独立执行程序的绿色安装包
-* `setup-lib`和`scaffold-wizard.setup-lib.zip`待被链接的动态链接库包
+* `setup-bin`和`scaffold-wizard.setup-bin.zip` --- 独立执行程序和其绿色安装包
+* `setup-lib`和`scaffold-wizard.setup-lib.zip` --- 动态链接库和其绿色安装包
 
-双击运行“绿色安装包”内的`scaffold-wizard.exe`便可，在`msys2`包管理器环境之外，运行。同理，“绿色安装包”内的`scaffold_wizard.dll`也能够脱离`msys2`被链接执行。但要稍稍再复杂一些。
+双击运行“绿色安装包”内的`bin/scaffold-wizard.exe`。便可，在`msys2`包管理器环境之外，运行应用程序。同理，“绿色安装包”内的`scaffold_wizard.dll`也能够脱离`msys2`地被链接调用。但要稍稍再复杂一些。
 
 #### `build.rs`
 
-每当执行`cargo`指令时，这个构建程序也都会被执行。在`target`目录下，它会创建若干指向`msys2`的符号链接。所以，强调环境变量`MSYS2_HOME`需要被配置，编译才能被正常地执行。
+每当执行`cargo`指令时，这个构建程序也都会被执行。在`target`目录下，它会创建若干指向`msys2`的符号链接。所以，强调：环境变量`MSYS2_HOME`需要被配置，编译才能被正常地执行。
+
+* 环境变量`MSYS2_HOME`保存了`msys2`的安装目录地址。
 
 ## 输入/输出说明
 
@@ -160,16 +164,16 @@ OPTIONS:
 
 ### 【问卷配置】`json`文件
 
-它全方位地抄袭了[Inquirer 的 Question 部分](https://github.com/SBoudrias/Inquirer.js#question)。但是，回调函数钩子那块，我是实在抄袭不来：
+它全方位地抄袭了[Inquirer 的 Question 部分](https://github.com/SBoudrias/Inquirer.js#question)。但是，【回调函数钩子】那块，我是实在抄袭不来，原因包括：
 
-* 第一，我自己不会做定制而精简的词法分析与执行器。
+* 第一，我自己不会做定制而精简的“脚本程序”词法分析与执行器。
 * 第二，集成`JavascriptCore`引擎又太重了。
 
-所以，现在阶段，我暂时搁置了点开这个方向的“科技树”。
+所以，现在阶段，我暂停点开这个方向的“科技树”。
 
-另一方面，作为对缺失了【回调函数钩子】的补偿，我在如下几处添加了新特性：
+另一方面，作为对缺失【回调函数钩子】的补偿，我在如下几处添加了新配置属性：
 
-1. 给`"type": "input"`类型（即，文本输入框）添加了`"subType": "port"`子类。其专门收集【数字类型】，取值范围在`1000 ~ 99999`的端口号。例如，
+1. 给`"type": "input"`类型（即，文本输入框）添加了`"subType": "port"`子类。其专门收集【数字类型】，取值范围在`1000 ~ 99999`的端口号。样板配置如下：
 
     ```json
     {
@@ -184,7 +188,7 @@ OPTIONS:
     }
     ```
 
-2. 给`"type": "list"`类型（即，单选题）的每一个单选项添加了`when`（布尔）表达式。从而，根据上下文内容，动态地决定此单选项是否会出现。例如，
+2. 给`"type": "list"`类型（即，单选题）的每一个单选项添加了`when`（布尔）表达式。从而，根据上下文内容，动态地决定当前单选项是否被显示出来。样板配置如下：
 
     ```json
     {
@@ -211,7 +215,7 @@ OPTIONS:
     }
     ```
 
-3. 给`"type": "checkbox"`类型（即，多选题）的每一个多选项添加了`mutex: boolean`属性。`"mutex": true`表示该选项具有排它性。若其被选中，则只能被单选。例如，
+3. 给`"type": "checkbox"`类型（即，多选题）的每一个多选项添加了`mutex: boolean`属性。`"mutex": true`表示该选项具有排它性。若其被选中，则该选项只能被单选。样板配置如下：
 
     ```json
     {
@@ -260,11 +264,12 @@ OPTIONS:
 
 最后，补充说明：
 
-* `"type": "checkbox"`类型题面对应的答案是`Map<String, boolean>`类型
+* `"type": "checkbox"`类型题面对应的答案类型是`Map<String, boolean>`
 
 ### 调用·动态链接库
 
-贴代码；在程序注释里，解释每个参数与返回值的用途。
+* 直接贴`nodejs`代码
+* 在程序注释里，解释每个参数与返回值的用途
 
 ```javascript
 const fs = require('fs');
@@ -296,8 +301,8 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
 
 > 注意：
 >
-> * 在链接与调用`DLL`时，请保持`target\setup-lib`内的目录结果。
-> * 在`windows`操作系统上，因为`C:\Windows\System32`目录下的`zlib1.dll`与`Gnome.GTK3`依赖的`zlib1.dll`名字冲突了。所以，为了让【问题】`DLL`能够正常地运行，需要（无论是手动、还是程序自动）复制`.boilerplate\bin\zlib1.dll`到`node`安装目录的根目录与`node.exe`文件同级。
+> * 在链接与调用`DLL`时，请保持`target\setup-lib`文件夹内的目录结构。
+> * 在`windows`操作系统上，因为`C:\Windows\System32`目录下的`zlib1.dll`与`Gnome.GTK3`依赖的`zlib1.dll`名字冲突了。所以，为了让【问卷】`DLL`能够正常地运行，需要（无论是手动、还是程序自动）复制`.boilerplate\bin\zlib1.dll`到`node`安装目录的根目录（即，`node.exe`所在的文件夹）。
 
 ### `N-API`封装
 
@@ -330,7 +335,7 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
 
 6. 完成所有问题之后，点击【完成】按钮。
 7. 程序退出。
-8.  【回答结果】`json`文件被输出到和输入文件相同的目录下，文件名为`answers.json`。
+8. 【回答结果】`json`文件被输出到和输入文件相同的目录下，文件名为`answers.json`。
 
 > 我已经在`windows 10x64`与`windows 7x64`亲自验证过了。
 
@@ -340,6 +345,11 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
 2. 完成`Neon`封装
 3. 向`ubuntu`, `MacOS`操作系统交叉编译
 4. 对`DLL`, `N-API`, `Neon`试着支持异步回调函数。而不是在调用期间阻塞住`node`进程。
+5. 就`DLL`或`C node module`【安装向导】组件这个业务场景，实现更高级的业务功能。即，
+   1. 接收【调用端】传入的回调函数。
+   2. 每完成一步【问题-收集】就调用回调函数向【调用端】通报进度，和暂停【交互流程】
+   3. 【调用端】异步地执行一些工作，再借助回调函数的返回值通知【安装向导】继续【交互流程】
+   4. 直到整个安装过程结束。
 
 ## 希望路过“大神”帮我看看
 
