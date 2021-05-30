@@ -5,10 +5,15 @@
 【问卷】既能够作为`.exe`文件被双击运行，也支持作为`.dll`文件被链接和调用-间接运行。
 
 * 前者的输入与输出都是`.json`文件。
-* 后者对外开放了一个`C ABI`（`char* inquire(char* questions, char* bin_dir, char* log4rs_file)`）以备调用。其中，
-  * 【问卷配置】以`json`字符串的形式从第一个形参`questions`传入。
-  * 【回答结果】以`json`字符串的形式从函数返回值传出。
-  * 在函数调用期间，会有`gnome`图形界面被弹出和提示用户输入问题答案。
+* 后者对外开放了两个`C ABI`以备调用。
+  * 同步接口：`char* inquire(char* questions, char* bin_dir, char* log4rs_file)`
+    * 【问卷配置】以`json`字符串的形式从第一个形参`questions`传入。
+    * 【回答结果】以`json`字符串的形式从函数返回值传出。
+  * 异步接口：`void inquireAsync(char* questions, char* bin_dir, char* log4rs_file, void (*callback)(char* answers))`
+    * 【问卷配置】以`json`字符串的形式从第一个形参`questions`传入。
+    * 【回答结果】通过最后一个【回调函数】实参的输入形参，以`json`字符串的形式异步地传出。
+
+在函数调用期间，会有`gnome`图形界面被弹出和提示用户输入问题答案。
 
 ## 制作这款工具的动机
 
