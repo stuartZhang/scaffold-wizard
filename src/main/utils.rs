@@ -1,7 +1,9 @@
 pub mod error;
 
-use ::std::{env, error::Error as StdError, path::{Path, PathBuf}};
-use ::log::debug;
+use ::std::{env, error::Error as StdError, fmt::{Debug, Display}, path::{Path, PathBuf}, rc::Rc, result::Result as StdResult};
+use ::log::{debug, error};
+use ::gtk::Builder;
+use super::render;
 pub use error::Error;
 
 pub type Result<T> = std::result::Result<T, Box<dyn StdError>>;
@@ -84,4 +86,58 @@ pub fn initialize_log4rs(log4rs_file: Option<&str>, bin_dir: Option<&Path>) -> R
         println!("[WARN]不能找到 log4rs 配置文件“{:?}”，所以日志没有被开启", log4rs_file);
     }
     Ok(())
+}
+pub struct Unwrap {
+    builder: Rc<Builder>
+}
+impl Unwrap {
+    pub fn new(builder: Rc<Builder>) -> Self {
+        Unwrap {builder}
+    }
+    pub fn result2<T, E: Debug, F>(expr: StdResult<T, E>, message: F) -> T
+    where F: AsRef<str> + Display {
+        match expr {
+            Ok(rs) => rs,
+            Err(err) => {
+                let message = message.as_ref();
+                error!("[unwrap_build]{}, {:?}", message, err);
+                panic!("{}, {:?}", message, err)
+            }
+        }
+    }
+    pub fn result3<T, E: Debug, F>(&self, expr: StdResult<T, E>, message: F) -> T
+    where F: AsRef<str> + Display {
+        match expr {
+            Ok(rs) => rs,
+            Err(err) => {
+                let message = message.as_ref();
+                error!("[unwrap_build]{}, {:?}", message, err);
+                render::err_popup(&self.builder, message);
+                panic!("{}, {:?}", message, err)
+            }
+        }
+    }
+    pub fn option2<T, F>(expr: Option<T>, message: F) -> T
+    where F: AsRef<str> + Display {
+        match expr {
+            Some(rs) => rs,
+            None => {
+                let message = message.as_ref();
+                error!("[unwrap_build]{}", message);
+                panic!("{}", message)
+            }
+        }
+    }
+    pub fn option3<T, F>(&self, expr: Option<T>, message: F) -> T
+    where F: AsRef<str> + Display {
+        match expr {
+            Some(rs) => rs,
+            None => {
+                let message = message.as_ref();
+                error!("[unwrap_build]{}", message);
+                render::err_popup(&self.builder, message);
+                panic!("{}", message)
+            }
+        }
+    }
 }

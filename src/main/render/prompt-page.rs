@@ -2,9 +2,9 @@ use ::gtk::{Align, Box as GtkBox, Label, Orientation, prelude::*};
 use ::log::debug;
 use ::serde_json::Value as jValue;
 use ::std::{path::Path, rc::Rc};
-use super::{Data, prompt_checkbox, prompt_input_port, prompt_input_text, prompt_radio, prompt_switch, StepDirection, StepTracer, Widgets};
+use super::{Data, prompt_checkbox, prompt_input_port, prompt_input_text, prompt_radio, prompt_switch, StepDirection, StepTracer, Unwrap, Widgets};
 
-pub fn draw_page(widgets: Widgets, step_tracer: StepTracer, data: Rc<Data>, bin_dir: Option<&Path>) {
+pub fn draw_page(widgets: Widgets, step_tracer: StepTracer, data: Rc<Data>, bin_dir: Option<&Path>, unwrap: Rc<Unwrap>) {
     let answers = Rc::clone(&data.answers);
     let prompts = Rc::clone(&data.prompts);
     let (name, json) = loop {
@@ -12,8 +12,7 @@ pub fn draw_page(widgets: Widgets, step_tracer: StepTracer, data: Rc<Data>, bin_
         let is_last_step = step_tracer.is_last();
         let step_number = step_tracer.get_number();
         let mut step_index = step_tracer.step_index.borrow_mut();
-        let (name, json) = prompts.iter().nth(*step_index)
-            .expect(&format!("没有第 {} 步配置", step_number)[..]);
+        let (name, json) = unwrap.option3(prompts.iter().nth(*step_index), format!("没有第 {} 步配置", step_number));
         debug!("第 {} 步，内容 {} {:?}", step_number, name, json);
         if super::evaluate_when(&format!("第 {} 步", step_number)[..], json, Rc::clone(&answers)) {
             break (name, json);

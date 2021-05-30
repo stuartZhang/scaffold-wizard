@@ -20,7 +20,9 @@ use ::gtk::{ApplicationWindow, Builder, Button, Frame, prelude::*};
 use ::log::debug;
 use ::serde_json::{map::Map, Value as jValue};
 use ::std::{path::PathBuf, cell::RefCell, rc::Rc};
+use super::utils::Unwrap;
 pub use prompt_page::draw_page;
+pub use error_dialog::show as err_popup;
 //
 pub enum StepDirection {
     FORWARD,
@@ -67,18 +69,14 @@ pub struct Data {
     pub answers: Rc<RefCell<Map<String, eValue>>>,
     pub prompts:Rc<Map<String, jValue>>
 }
-pub fn connect_signals(builder: &Builder, handler_name: &str,
-                       step_count: usize, step_index: Rc<RefCell<usize>>,
-                       data: Rc<Data>, answers_str: Rc<RefCell<Option<String>>>, bin_dir: Rc<Option<PathBuf>>)
+pub fn connect_signals(builder: &Builder, handler_name: &str, step_count: usize, step_index: Rc<RefCell<usize>>,
+                       data: Rc<Data>, answers_str: Rc<RefCell<Option<String>>>, bin_dir: Rc<Option<PathBuf>>,
+                       unwrap: Rc<Unwrap>)
                        -> Box<dyn Fn(&[GtkValue]) -> Option<GtkValue> + 'static> {
-    let window: ApplicationWindow = builder.get_object("outmost-window")
-        .expect("不能从 glade 布局文件里，找到 outmost-window 元素");
-    let step_viewer: Frame = builder.get_object("step-viewer")
-        .expect("不能从 glade 布局文件里，找到 step-viewer 元素");
-    let prev_step_btn: Button = builder.get_object("btn-prev-step")
-        .expect("不能从 glade 布局文件里，找到 btn-prev-step 元素");
-    let next_step_btn: Button = builder.get_object("btn-next-step")
-        .expect("不能从 glade 布局文件里，找到 btn-next-step 元素");
+    let window: ApplicationWindow = unwrap.option3(builder.get_object("outmost-window"), "不能从 glade 布局文件里，找到 outmost-window 元素");
+    let step_viewer: Frame = unwrap.option3(builder.get_object("step-viewer"), "不能从 glade 布局文件里，找到 step-viewer 元素");
+    let prev_step_btn: Button = unwrap.option3(builder.get_object("btn-prev-step"), "不能从 glade 布局文件里，找到 btn-prev-step 元素");
+    let next_step_btn: Button = unwrap.option3(builder.get_object("btn-next-step"), "不能从 glade 布局文件里，找到 btn-next-step 元素");
     if handler_name == "on-btn-prev-click" {
         Box::new(clone!(@weak prev_step_btn, @weak next_step_btn, @weak step_viewer, @strong step_index, @strong data, @strong bin_dir => @default-return None, move |_| {
             {
@@ -95,14 +93,14 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
                 step_index: Rc::clone(&step_index),
                 step_count,
                 direction: StepDirection::BACKWARD
-            }, Rc::clone(&data), bin_dir.as_deref());
+            }, Rc::clone(&data), bin_dir.as_deref(), Rc::clone(&unwrap));
             None
         }))
     } else if handler_name == "on-btn-next-click" {
-        Box::new(clone!(@weak prev_step_btn, @weak next_step_btn, @weak step_viewer, @strong step_index, @strong builder, @strong data => @default-return None, move |_| {
+        Box::new(clone!(@weak prev_step_btn, @weak next_step_btn, @weak step_viewer, @strong step_index, @strong builder, @strong data, @strong unwrap => @default-return None, move |_| {
             {
                 let mut step_index = step_index.borrow_mut();
-                if let Err(message) = validate_page(*step_index, Rc::clone(&data)) {
+                if let Err(message) = validate_page(*step_index, Rc::clone(&data), Rc::clone(&unwrap)) {
                     debug!("表单验证失败消息：{}", message);
                     error_dialog::show(&builder, &message[..]);
                     return None;
@@ -119,7 +117,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
                 step_index: Rc::clone(&step_index),
                 step_count,
                 direction: StepDirection::FORWARD
-            }, Rc::clone(&data), bin_dir.as_deref());
+            }, Rc::clone(&data), bin_dir.as_deref(), Rc::clone(&unwrap));
             None
         }))
     } else if handler_name == "on-btn-submit-click" {
@@ -128,7 +126,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
             None
         }))
     } else if handler_name == "on-window-delete" {
-        Box::new(clone!(@strong window, @strong builder, @strong data, @strong answers_str => @default-return true.to_value(), move |_| {
+        Box::new(clone!(@strong window, @strong builder, @strong data, @strong answers_str, @strong unwrap => @default-return true.to_value(), move |_| {
             let answers = Rc::clone(&data.answers);
             let prompts = Rc::clone(&data.prompts);
             let answers_output = serde_json::to_string_pretty(&jValue::Object(answers.borrow().clone())).unwrap();
@@ -136,7 +134,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
             let mut error_message = None;
             for (step_index, (name, json)) in prompts.iter().enumerate() {
                 if evaluate_when(&format!("第 {} 个问题 {}", step_index, name)[..], json, Rc::clone(&answers)) {
-                    if let Err(message) = validate_page(step_index, Rc::clone(&data)) {
+                    if let Err(message) = validate_page(step_index, Rc::clone(&data), Rc::clone(&unwrap)) {
                         error_message = Some(message);
                         break;
                     }
@@ -158,12 +156,11 @@ pub fn connect_signals(builder: &Builder, handler_name: &str,
         panic!("未被处理的组件事件 {}", handler_name)
     }
 }
-fn validate_page(step_index: usize, data: Rc<Data>) -> Result<(), String> {
+fn validate_page(step_index: usize, data: Rc<Data>, unwrap: Rc<Unwrap>) -> Result<(), String> {
     let step_number = step_index + 1;
     let answers = Rc::clone(&data.answers);
     let prompts = Rc::clone(&data.prompts);
-    let (name, json) = prompts.iter().nth(step_index)
-        .expect(&format!("没有第 {} 步配置", step_number)[..]);
+    let (name, json) = unwrap.option3(prompts.iter().nth(step_index), format!("没有第 {} 步配置", step_number));
     let required = json["required"].as_bool().unwrap_or_default();
     let q_type = json["type"].as_str().unwrap_or_default();
     let answers = answers.borrow();

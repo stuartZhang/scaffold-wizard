@@ -2,24 +2,22 @@
 mod main;
 
 use ::std::{ffi::CString, os::raw::c_char, path::PathBuf, ptr};
-use main::QuestionsInput;
+use main::{QuestionsInput, Unwrap};
 
 #[no_mangle]
 pub extern fn inquire(questions: *const c_char, bin_dir: *const c_char, log4rs_file: *const c_char) -> *const c_char {
-    let questions = unsafe {CString::from_raw(questions as *mut i8)}.into_string()
-        .expect("解析输入字符串错误");
-    let bin_dir = unsafe {CString::from_raw(bin_dir as *mut i8)}.into_string()
-        .expect("解析输入字符串错误");
+    let questions = Unwrap::result2(unsafe {CString::from_raw(questions as *mut i8)}.into_string(), "解析输入字符串错误");
+    let bin_dir = Unwrap::result2(unsafe {CString::from_raw(bin_dir as *mut i8)}.into_string(), "解析输入字符串错误");
     let bin_dir = PathBuf::from(bin_dir);
     if !log4rs_file.is_null() { // 初始化日志系统
         let log4rs_file = unsafe {CString::from_raw(log4rs_file as *mut i8)}.into_string();
         let log4rs_file = log4rs_file.as_deref().ok();
-        main::initialize_log4rs(log4rs_file, Some(bin_dir.as_path())).expect("log4rs初始化失败");
+        Unwrap::result2(main::initialize_log4rs(log4rs_file, Some(bin_dir.as_path())), "log4rs初始化失败");
     }
     // 收集答案
     if let (_, Some(answers)) = main::main(QuestionsInput::FileText(questions), Some(bin_dir)) {
         // 写入【问卷】的输出文件
-        return CString::new(answers).expect("打包输出字符串错误").into_raw();
+        return Unwrap::result2(CString::new(answers), "打包输出字符串错误").into_raw();
     }
     ptr::null()
 }
