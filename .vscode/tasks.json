@@ -42,10 +42,53 @@
             }]
         }
     }, {
-        "label": "test",
+        "label": "test-sync",
         "command": "cargo",
         "args": [
             "test",
+            "test_sync",
+            "--",
+            "--nocapture"
+        ],
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        },
+        "group": {
+            "kind": "test",
+            "isDefault": true
+        },
+        "isBackground": true,
+        "problemMatcher": {
+            "owner": "wasm-pack",
+            "background": {
+                "activeOnStart": true,
+                "beginsPattern": "Checking for the Wasm target\\.\\.\\.",
+                "endsPattern": "Your wasm pkg is ready to publish at"
+            },
+            "pattern": [{
+                "regexp": "^\\s*(\\S+)\\s*$",
+                "file": 1
+            }, {
+                "regexp": "^\\s+(\\d+):(\\d+)\\s+(\\S+)\\s+(.*)\\s\\s+(.*)\\s*$",
+                "line": 1,
+                "column": 2,
+                "severity": 3,
+                "message": 4,
+                "code": 5
+            }]
+        }
+    }, {
+        "label": "test-async",
+        "command": "cargo",
+        "args": [
+            "test",
+            "test_async",
             "--",
             "--nocapture"
         ],
