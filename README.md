@@ -281,6 +281,13 @@ OPTIONS:
 * 直接贴`nodejs`代码
 * 在程序注释里，解释每个参数与返回值的用途
 
+> 注意：
+>
+> * 在链接与调用`DLL`时，请保持`target\setup-lib`文件夹内的目录结构。
+> * 在`windows`操作系统上，因为`C:\Windows\System32`目录下的`zlib1.dll`与`Gnome.GTK3`依赖的`zlib1.dll`名字冲突了。所以，为了让【问卷】`DLL`能够正常地运行，需要（无论是手动、还是程序自动）复制`.boilerplate\bin\zlib1.dll`到`node`安装目录的根目录（即，`node.exe`所在的文件夹）。
+
+#### 同步接口调用
+
 ```javascript
 const fs = require('fs');
 const ffi = require('ffi');
@@ -296,7 +303,8 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
     const dllFile = path.join(homeDir, 'bin/scaffold_wizard.dll');
     const dllDir = path.dirname(dllFile);
     const scaffoldWizard = ffi.Library(dllFile, {
-        inquire: ['string', ['string', 'string', 'string']]
+        inquire: ['string', ['string', 'string', 'string']],
+        inquireAsync: ['void', ['string', 'string', 'string', 'pointer']]
     });
     // 调用 DLL
     // inquire(...) 一共有三个输入参数
@@ -309,10 +317,37 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
 });
 ```
 
-> 注意：
->
-> * 在链接与调用`DLL`时，请保持`target\setup-lib`文件夹内的目录结构。
-> * 在`windows`操作系统上，因为`C:\Windows\System32`目录下的`zlib1.dll`与`Gnome.GTK3`依赖的`zlib1.dll`名字冲突了。所以，为了让【问卷】`DLL`能够正常地运行，需要（无论是手动、还是程序自动）复制`.boilerplate\bin\zlib1.dll`到`node`安装目录的根目录（即，`node.exe`所在的文件夹）。
+#### 异步接口调用
+
+```javascript
+const fs = require('fs');
+const ffi = require('ffi');
+const ref = require('ref');
+const path = require('path');
+const util = require('util');
+// 准备【问卷配置】`json`文件
+const homeDir = path.resolve('target/setup-lib');
+const questionsFile = path.join(homeDir, 'assets/prompt-manifest.json');
+const readFile = util.promisify(fs.readFile);
+readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
+    // 加载 DLL
+    const dllFile = path.join(homeDir, 'bin/scaffold_wizard.dll');
+    const dllDir = path.dirname(dllFile);
+    const scaffoldWizard = ffi.Library(dllFile, {
+        inquire: ['string', ['string', 'string', 'string']],
+        inquireAsync: ['void', ['string', 'string', 'string', 'pointer']]
+    });
+    // 调用 DLL
+    // inquire(...) 一共有三个输入参数
+    // (1) JSON 格式字符串，包括了【问卷配置】
+    // (2) 被加载 DLL 文件所在的目录。以此，来寻找 assets\images 目录。
+    // (3) log4rs 的配置文件路径。传一个空指针，表示关闭日志功能。
+    // 输出返回值是 JSON 格式字符串，包括了【回答结果】
+    scaffoldWizard.inquireAsync(questions, dllDir, ref.NULL_POINTER, ffi.Callback('void', ['string'], answers => {
+        console.info('被收集的答案包括', answers);
+    }));
+});
+```
 
 ### `N-API`封装
 
