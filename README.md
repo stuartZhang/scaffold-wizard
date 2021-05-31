@@ -398,6 +398,7 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
 6. 将此工程内一些通用的部分添加到【前端-脚手架】内的【`rust`工程原型】里。比如，
    1. `build.js`脚本与`.boilerplate`目录，生成【绿色安装包】
    2. `build.rs`为`cargo run`准备符号链接
+7. 考虑到`WebkitGTK`不兼容于`windows`操作系统。后续不可避免向`QT`组件库技术转向。
 
 ## 希望路过“大神”帮我看看
 
