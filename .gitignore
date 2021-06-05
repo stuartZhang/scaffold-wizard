@@ -6,4 +6,4 @@ logs/
 node_modules/
 assets/answers.json
 assets/answers1.json
-node-link/node_modules
+dll-invocation-examples/node_modules

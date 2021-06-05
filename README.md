@@ -9,9 +9,9 @@
   * 同步接口：`char* inquire(char* questions, char* bin_dir, char* log4rs_file)`
     * 【问卷配置】以`json`字符串的形式从第一个形参`questions`传入。
     * 【回答结果】以`json`字符串的形式从函数返回值传出。
-  * 异步接口：`void inquireAsync(char* questions, char* bin_dir, char* log4rs_file, void (*callback)(char* answers))`
+  * `nodejs`风格的异步接口：`void inquireAsync(char* questions, char* bin_dir, char* log4rs_file, void (*callback)(char* error, char* answers))`
     * 【问卷配置】以`json`字符串的形式从第一个形参`questions`传入。
-    * 【回答结果】通过最后一个【回调函数】实参的输入形参，以`json`字符串的形式异步地传出。
+    * 【回答结果】通过最后一个【回调函数】的第二个实参输入形参，以`json`字符串的形式异步地传出。
 
 在函数调用期间，会有`gnome`图形界面被弹出和提示用户输入问题答案。
 
@@ -304,7 +304,6 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
     const dllDir = path.dirname(dllFile);
     const scaffoldWizard = ffi.Library(dllFile, {
         inquire: ['string', ['string', 'string', 'string']],
-        inquireAsync: ['void', ['string', 'string', 'string', 'pointer']]
     });
     // 调用 DLL
     // inquire(...) 一共有三个输入参数
@@ -334,7 +333,6 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
     const dllFile = path.join(homeDir, 'bin/scaffold_wizard.dll');
     const dllDir = path.dirname(dllFile);
     const scaffoldWizard = ffi.Library(dllFile, {
-        inquire: ['string', ['string', 'string', 'string']],
         inquireAsync: ['void', ['string', 'string', 'string', 'pointer']]
     });
     // 调用 DLL
@@ -343,10 +341,27 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
     // (2) 被加载 DLL 文件所在的目录。以此，来寻找 assets\images 目录。
     // (3) log4rs 的配置文件路径。传一个空指针，表示关闭日志功能。
     // 输出返回值是 JSON 格式字符串，包括了【回答结果】
-    scaffoldWizard.inquireAsync(questions, dllDir, ref.NULL_POINTER, ffi.Callback('void', ['string'], answers => {
-        console.info('被收集的答案包括', answers);
-    }));
+    scaffoldWizard.inquireAsync(questions, dllDir, ref.NULL_POINTER, ffi.Callback('void', ['string', 'string'],
+        finishedBuilder((err, answers) => {
+            if (err) {
+                console.error('失败原因', err);
+            } else {
+                console.info('被收集的答案包括', answers);
+            }
+        })
+    ));
 });
+function finishedBuilder(callback){
+    let timerId;
+    const holding = () => { // 锁住 event loop，不立即结束程序。
+        timerId = setTimeout(holding, 1000 * 60 * 60);
+    };
+    holding();
+    return (err, answers) => {
+        clearTimeout(timerId); // 解锁
+        return callback(err, answers);
+    };
+}
 ```
 
 ### `N-API`封装
@@ -389,16 +404,15 @@ readFile(questionsFile, {encoding: 'utf8'}).then(questions => {
 1. 完成`N-API`封装，让它更容易地与`nodejs`集成。`node-ffi`的集成方式还是太繁琐了。能够直接支持操作系统也有限。比如说，【中标麒麟】的国产操作系统就没有被明确地表示支持。
 2. 完成`Neon`封装
 3. 向`ubuntu`, `MacOS`操作系统交叉编译
-4. 对`DLL`, `N-API`, `Neon`试着支持异步回调函数。而不是在调用期间阻塞住`node`进程。
-5. 就`DLL`或`C node module`【安装向导】组件这个业务场景，实现更高级的业务功能。即，
+4. 就`DLL`或`C node module`【安装向导】组件这个业务场景，实现更高级的业务功能。即，
    1. 接收【调用端】传入的回调函数。
    2. 每完成一步【问题-收集】就调用回调函数向【调用端】通报进度，和暂停【交互流程】
    3. 【调用端】异步地执行一些工作，再借助回调函数的返回值通知【安装向导】继续【交互流程】
    4. 直到整个安装过程结束。
-6. 将此工程内一些通用的部分添加到【前端-脚手架】内的【`rust`工程原型】里。比如，
+5. 将此工程内一些通用的部分添加到【前端-脚手架】内的【`rust`工程原型】里。比如，
    1. `build.js`脚本与`.boilerplate`目录，生成【绿色安装包】
    2. `build.rs`为`cargo run`准备符号链接
-7. 考虑到`WebkitGTK`不兼容于`windows`操作系统。后续不可避免向`QT`组件库技术转向。
+6. 考虑到`WebkitGTK`不兼容于`windows`操作系统。后续不可避免向`QT`组件库技术转向。
 
 ## 希望路过“大神”帮我看看
 

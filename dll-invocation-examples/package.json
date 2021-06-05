@@ -1,0 +1,25 @@
+{
+    "name": "dll-invocation-examples",
+    "version": "1.0.0",
+    "description": "使用`node-ffi`包装DLL文件。",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "node",
+        "rust",
+        "ffi",
+        "gtk"
+    ],
+    "author": "stuart_zhang",
+    "license": "MIT",
+    "dependencies": {
+        "ffi": "^2.3.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.20.0",
+        "eslint-config-minxing": "^2.0.8"
+    }
+}
