@@ -280,6 +280,7 @@ OPTIONS:
 
 * 直接贴`nodejs`代码
 * 在程序注释里，解释每个参数与返回值的用途
+* 基于`nde-ffi`的完整例子请见目录`dll-invocation-examples`下的`index.js`文件。
 
 > 注意：
 >
