@@ -30,5 +30,6 @@ quick-xml = {version = "0.22.0", features = ["encoding_rs"]}
 serde_json = {version = "1.0", features = ["preserve_order"]}
 
 [dev-dependencies]
+async-std = {version = "1.9.0", features = ["unstable"]}
 lazy_static = "1.4.0"
 mut_static = "5.0.0"

@@ -52,71 +52,92 @@ pub extern fn inquire_async(questions: *const c_char, bin_dir: *const c_char, lo
 mod test {
     use ::lazy_static::lazy_static;
     use ::mut_static::MutStatic;
-    use ::std::{env, fs, path::Path, thread, time::Duration};
+    use ::std::{env, error::Error, ops::Deref, path::Path, marker::Send, time::Duration};
+    use ::async_std::{fs, task};
     use super::{c_char, CString, main, ptr};
     lazy_static! {
         static ref ANSWER_ASYNC: MutStatic<Option<String>> = MutStatic::new();
     }
+    struct Answer(*const c_char);
+    unsafe impl Send for Answer {}
+    impl Deref for Answer {
+        type Target = *const c_char;
+        fn deref(&self) -> &Self::Target {
+            return &self.0;
+        }
+    }
     #[test]
-    fn test_sync() {
+    fn test_sync() -> Result<(), Box<dyn Error>> {
         let input_file = "../assets/prompt-manifest.json";
         let output_file = "../assets/answers-unit_test.json";
         // 拼接输入与输出文件路径
-        let (input_file, output_dir) = main::find_input_file(input_file).unwrap();
-        // 读入【问卷】的输入文件
-        let questions = fs::read_to_string(input_file).unwrap();
-        let questions = CString::new(questions).unwrap();
-        // 工作目录
-        let mut bin_dir = env::current_dir().unwrap();
-        bin_dir.push(Path::new("target/debug"));
-        let bin_dir = CString::new(bin_dir.to_str().unwrap()).unwrap();
-        // 收集答案
-        let answers = super::inquire(questions.into_raw(), bin_dir.into_raw(), ptr::null());
-        let answers = unsafe {CString::from_raw(answers as *mut c_char)}.into_string().unwrap();
-        // 读入【问卷】的输出文件
-        let output_file = main::find_output_file(output_file, &output_dir);
-        let output_file = fs::read_to_string(output_file).unwrap();
-        // 比较
-        assert_eq!(format!("{}\n", answers), output_file);
+        let (input_file, output_dir) = main::find_input_file(input_file)?;
+        task::block_on(async {
+            // 读入【问卷】的输入文件
+            let questions = fs::read_to_string(input_file).await?;
+            let questions = CString::new(questions)?;
+            // 工作目录
+            let mut bin_dir = env::current_dir()?;
+            bin_dir.push(Path::new("target/debug"));
+            let bin_dir = CString::new(bin_dir.to_str().ok_or("非 UTF-8 路径字符串")?)?;
+            // 收集答案
+            let answers = task::spawn_blocking(|| {
+                let answer = super::inquire(questions.into_raw(), bin_dir.into_raw(), ptr::null());
+                Answer(answer)
+            }).await;
+            let answers = unsafe {CString::from_raw(*answers as *mut c_char)}.into_string()?;
+            // 读入【问卷】的输出文件
+            let output_file = main::find_output_file(output_file, &output_dir);
+            let output_file = fs::read_to_string(output_file).await?;
+            // 比较
+            assert_eq!(format!("{}\n", answers), output_file);
+            Ok(())
+        })
     }
     #[test]
-    fn test_async() {
+    fn test_async() -> Result<(), Box<dyn Error>> {
         let input_file = "../assets/prompt-manifest.json";
         // 拼接输入与输出文件路径
-        let (input_file, _) = main::find_input_file(input_file).unwrap();
-        // 读入【问卷】的输入文件
-        let questions = fs::read_to_string(input_file).unwrap();
-        let questions = CString::new(questions).unwrap();
-        // 工作目录
-        let mut bin_dir = env::current_dir().unwrap();
-        bin_dir.push(Path::new("target/debug"));
-        let bin_dir = CString::new(bin_dir.to_str().unwrap()).unwrap();
-        // 收集答案
-        ANSWER_ASYNC.set(None).unwrap();
-        super::inquire_async(questions.into_raw(), bin_dir.into_raw(), ptr::null(), cb);
-        loop {
-            if let Some(_) = *ANSWER_ASYNC.read().unwrap() {
-                break;
+        let (input_file, _) = main::find_input_file(input_file)?;
+        task::block_on(async {
+            // 读入【问卷】的输入文件
+            let questions = fs::read_to_string(input_file).await?;
+            let questions = CString::new(questions)?;
+            // 工作目录
+            let mut bin_dir = env::current_dir()?;
+            bin_dir.push(Path::new("target/debug"));
+            let bin_dir = CString::new(bin_dir.to_str().ok_or("非 UTF-8 路径字符串")?)?;
+            // 收集答案
+            ANSWER_ASYNC.set(None)?;
+            super::inquire_async(questions.into_raw(), bin_dir.into_raw(), ptr::null(), cb);
+            loop {
+                if let Some(_) = *ANSWER_ASYNC.read()? {
+                    break;
+                }
+                task::sleep(Duration::from_millis(600)).await;
             }
-            thread::sleep(Duration::from_millis(600));
-        }
+            Ok(())
+        })
     }
     extern fn cb(err: *const c_char, answers: *const c_char) {
-        let mut answers_async = ANSWER_ASYNC.write().unwrap();
-        if err.is_null() {
-            let answers = unsafe {CString::from_raw(answers as *mut c_char)}.into_string().unwrap();
-            // 读入【问卷】的输出文件
-            let input_file = "../assets/prompt-manifest.json";
-            let output_file = "../assets/answers-unit_test.json";
-            let (_, output_dir) = main::find_input_file(input_file).unwrap();
-            let output_file = main::find_output_file(output_file, &output_dir);
-            let output_file = fs::read_to_string(output_file).unwrap();
-            // 比较
-            answers_async.replace(answers.clone());
-            assert_eq!(format!("{}\n", answers), output_file);
-        } else {
-            let err = unsafe {CString::from_raw(err as *mut c_char)}.into_string().unwrap();
-            answers_async.replace(err);
-        }
+        task::block_on::<_, Result<(), Box<dyn Error>>>(async {
+            let mut answers_async = ANSWER_ASYNC.write()?;
+            if err.is_null() {
+                let answers = unsafe {CString::from_raw(answers as *mut c_char)}.into_string()?;
+                // 读入【问卷】的输出文件
+                let input_file = "../assets/prompt-manifest.json";
+                let output_file = "../assets/answers-unit_test.json";
+                let (_, output_dir) = main::find_input_file(input_file)?;
+                let output_file = main::find_output_file(output_file, &output_dir);
+                let output_file = fs::read_to_string(output_file).await?;
+                // 比较
+                answers_async.replace(answers.clone());
+                assert_eq!(format!("{}\n", answers), output_file);
+            } else {
+                let err = unsafe {CString::from_raw(err as *mut c_char)}.into_string()?;
+                answers_async.replace(err);
+            }
+            Ok(())
+        }).unwrap();
     }
 }
