@@ -4,11 +4,10 @@ const ffi = require('ffi');
 const util = require('util');
 const path = require('path');
 const os = require('os');
+const safeRequire = require('safe-require');
 //
 const unlink = util.promisify(fs.unlink);
-const symlink = util.promisify(fs.symlink);
 const readFile = util.promisify(fs.readFile);
-const lstat = util.promisify(fs.lstat);
 //
 const homeDir = path.resolve(__dirname, '../target/setup-lib');
 const isAsync = ~process.argv.indexOf('--async-mode');
@@ -18,16 +17,19 @@ const isAsync = ~process.argv.indexOf('--async-mode');
     const dllDir = path.dirname(dllFile);
     let zlib1Target;
     if (os.platform() === 'win32') {
-        const zlib1Src = path.join(dllDir, 'zlib1.dll');
-        zlib1Target = path.join(path.dirname(process.execPath), 'zlib1.dll');
-        await lstat(zlib1Target).then(async stats => {
-            if (stats.isSymbolicLink()) {
-                await unlink(zlib1Target);
-                await symlink(zlib1Src, zlib1Target, 'file');
+        const injector = safeRequire('node-dll-injector');
+        if (injector) {
+            const zlib1Src = path.join(dllDir, 'zlib1.dll');
+            const isNodeRunning = injector.isProcessRunningPID(process.pid);
+            if (isNodeRunning) {
+                const success = injector.injectPID(process.pid, zlib1Src);
+                if (success === 0) {
+                    console.info('Successfully injected!');
+                } else {
+                    console.error('Injection failed. :(', success, process.pid, zlib1Src);
+                }
             }
-        }, () => symlink(zlib1Src, zlib1Target, 'file'));
-        //
-        process.env.PATH = `${dllDir}${path.delimiter}${process.env.PATH}`;
+        }
     }
     const questionsFile = path.join(homeDir, 'assets/prompt-manifest.json');
     const questions = await readFile(questionsFile, {encoding: 'utf8'});
