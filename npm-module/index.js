@@ -19,7 +19,7 @@ exports.inquire = questions => download().then(() => {
     const scaffoldWizard = ffi.Library(ENTRY_FILE, {
         inquire: ['string', ['string', 'string', 'string']]
     });
-    return scaffoldWizard.inquire(reformQuestions(questions), BIN_DIR, ref.NULL_POINTER);
+    return JSON.parse(scaffoldWizard.inquire(reformQuestions(questions), BIN_DIR, ref.NULL_POINTER));
 });
 exports.inquireAsync = questions => download().then(() => new Promise((resolve, reject) => {
     downloader.downloadUrl; // eslint-disable-line no-unused-expressions
@@ -32,9 +32,9 @@ exports.inquireAsync = questions => download().then(() => new Promise((resolve, 
     });
     const nativeCallback = ffi.Callback('void', ['string', 'string'], finishedBuilder((err, answers) => {
         if (err) {
-            reject(err);
+            reject(new Error(err));
         } else {
-            resolve(answers);
+            resolve(JSON.parse(answers));
         }
     }));
     scaffoldWizard.inquireAsync(reformQuestions(questions), BIN_DIR, ref.NULL_POINTER, nativeCallback);
