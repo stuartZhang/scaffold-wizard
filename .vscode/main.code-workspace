@@ -1,0 +1,54 @@
+{
+    "folders": [
+        {
+			"name": "rust-gui",
+			"path": "../"
+		},
+        {
+			"name": "npmjs发布包",
+			"path": "../npm-module/"
+		},
+        {
+			"name": "简单功能演示",
+			"path": "../dll-invocation-examples/"
+		}
+    ],
+    "settings": {
+        "css.validate": false,
+        "debug.inlineValues": true,
+        "debug.openExplorerOnEnd": true,
+        "debug.allowBreakpointsEverywhere": true,
+        "editor.detectIndentation": false,
+        "editor.snippetSuggestions": "top",
+        "editor.tabCompletion": "on",
+        "editor.tabSize": 4,
+        "editor.wordWrap": "on",
+        "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
+        "explorer.autoReveal": true,
+        "files.eol": "\n",
+        "files.exclude": {
+            "npm-module": true,
+            "dll-invocation-examples": true,
+            "node_modules/.bin": true
+        },
+        "files.trimTrailingWhitespace": true,
+        "gitlens.currentLine.enabled": false,
+        "git.ignoreLimitWarning": true,
+        "html.validate.scripts": false,
+        "javascript.validate.enable": false,
+        "projectManager.groupList": true,
+        "projectManager.sortList": "Recent",
+        "projectManager.openInNewWindowWhenClickingInStatusBar": true,
+        "rust-analyzer.updates.askBeforeDownload": true,
+        "rust-analyzer.updates.channel": "nightly",
+        "rust-analyzer.procMacro.enable": true,
+        "rust-analyzer.inlayHints.parameterHints": false,
+        "rust-analyzer.diagnostics.disabled": [
+            "missing-unsafe"
+        ], // 不是 cargo check 的官方错误类型
+        "scss.validate": false,
+        "workbench.editor.closeOnFileDelete": false,
+        "workbench.editor.revealIfOpen": true,
+        "vsicons.presets.angular": false
+    }
+}

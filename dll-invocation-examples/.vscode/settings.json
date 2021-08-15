@@ -1,0 +1,12 @@
+{
+    // 机器性能高的话，请把这个配置项复制入【用户级】的 vscode 配置文件里。
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "eslint.validate": [
+        "typescript",
+        "javascript"
+    ],
+    "prettier.singleQuote": true, // 强制单引号
+    "prettier.trailingComma": "all" // 尽可能控制尾随逗号的打印
+}

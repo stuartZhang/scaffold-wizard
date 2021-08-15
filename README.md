@@ -190,7 +190,7 @@ OPTIONS:
         "appPort": { // 这个问题唯一标识字符串。相当于主键 ID。
             "when": "subprojects.app", // 条件表达式，当前问题是出现在交互流程中（true），还是被跳过（false）。
             "type": "input", // 文本输入框
-            "subType": "port", // 之端口数字输入框
+            "subType": "port", // 端口数字输入框
             "message": "请输入 移动端 webpack dev server 监听端口号", // 题面
             "required": true, // 是否必填
             "default": 9010 // 默认值

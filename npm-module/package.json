@@ -1,0 +1,49 @@
+{
+    "name": "scaffold-wizard",
+    "version": "1.0.0",
+    "description": "图形界面版的 inquirer。由 rust + GNOME.GTK3 制作。",
+    "main": "index.js",
+    "typings": "index.d.ts",
+    "types": "index.d.ts",
+    "private": true,
+    "scripts": {
+        "postinstall": "node post-install.js",
+        "test": "node test.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/stuartZhang/scaffold-wizard"
+    },
+    "os": [
+        "win32"
+    ],
+    "cpu": [
+        "x64"
+    ],
+    "engines": {
+        "node": ">=10"
+    },
+    "keywords": [
+        "node",
+        "rust",
+        "ffi",
+        "gtk"
+    ],
+    "author": "stuart_zhang",
+    "license": "MIT",
+    "dependencies": {
+        "@types/inquirer": "^6.5.0",
+        "chalk": "^4.1.0",
+        "cli-progress": "^3.9.0",
+        "debug": "^4.3.1",
+        "download": "^8.0.0",
+        "ffi": "^2.3.0",
+        "fs-extra": "^9.1.0",
+        "node-dll-injector": "^0.2.3",
+        "safe-require": "^1.0.4"
+    },
+    "devDependencies": {
+        "eslint": "^7.20.0",
+        "eslint-config-minxing": "^2.0.8"
+    }
+}

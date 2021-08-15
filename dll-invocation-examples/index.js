@@ -6,7 +6,6 @@ const path = require('path');
 const os = require('os');
 const safeRequire = require('safe-require');
 //
-const unlink = util.promisify(fs.unlink);
 const readFile = util.promisify(fs.readFile);
 //
 const homeDir = path.resolve(__dirname, '../target/setup-lib');
@@ -15,18 +14,15 @@ const isAsync = ~process.argv.indexOf('--async-mode');
 (async () => {
     const dllFile = path.join(homeDir, 'bin/scaffold_wizard.dll');
     const dllDir = path.dirname(dllFile);
-    let zlib1Target;
-    if (os.platform() === 'win32') {
+    if (os.platform() === 'win32' && os.arch() === 'x64') {
         const injector = safeRequire('node-dll-injector');
         if (injector) {
             const zlib1Src = path.join(dllDir, 'zlib1.dll');
             const isNodeRunning = injector.isProcessRunningPID(process.pid);
             if (isNodeRunning) {
                 const success = injector.injectPID(process.pid, zlib1Src);
-                if (success === 0) {
-                    console.info('Successfully injected!');
-                } else {
-                    console.error('Injection failed. :(', success, process.pid, zlib1Src);
+                if (success !== 0) {
+                    throw new Error(`${zlib1Src} 注入失败：${success}, ${process.pid}`);
                 }
             }
         }
@@ -43,11 +39,8 @@ const isAsync = ~process.argv.indexOf('--async-mode');
     } else {
         finished(null, scaffoldWizard.inquire(questions, dllDir, ref.NULL_POINTER));
     }
-    async function finished(err, answers){
+    function finished(err, answers){
         if (err == null) {
-            if (zlib1Target) {
-                await unlink(zlib1Target);
-            }
             console.info('被收集的答案包括', answers);
         } else {
             console.error('错误消息', err);
