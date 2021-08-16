@@ -415,7 +415,7 @@ export function inquireAsync(questions: Questions): Promise<inquirer.Answers>;
 ## 与[inquirer](https://www.npmjs.com/package/inquirer)的细微差别
 
 1. 问卷配置对象是`Object<inquirer.KeyUnion<T>, inquirer.DistinctQuestion<T>>`，而不是`Array<inquirer.DistinctQuestion<T>>`。
-   1. 这一点不没有顺从于·原著·是为了更容易地与公司现成的【前端-脚手架】安装向导对接。所以，从核心层[Rust + GNOME.GTK3 图形界面版 inquirer](https://github.com/stuartZhang/scaffold-wizard/)就这么处理的数据结构。
+   1. 这一点没有顺从于·原著·是为了更容易地与公司现成的【前端-脚手架】安装向导对接。所以，从核心层[Rust + GNOME.GTK3 图形界面版 inquirer](https://github.com/stuartZhang/scaffold-wizard/)就这么处理的数据结构。
 2. 单个问题【配置对象】内暂时缺少【回调函数】支持 --- 这类·动态出现的·`FFI`接口，我还不会做。但作为补偿，我在如下几处添加了新配置属性：
    1. 给`"type": "input"`类型（即，文本输入框）添加了`"subType": "port"`子类。其专门收集【数字类型】，取值范围在`1000 ~ 99999`的端口号。样板配置如下：
 
