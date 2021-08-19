@@ -9,6 +9,7 @@ const downloader = require('./download');
 const {CACHE_DIR, download} = downloader;
 const BIN_DIR = path.join(CACHE_DIR, 'bin');
 const ENTRY_FILE = path.join(BIN_DIR, 'scaffold_wizard.dll');
+let nativeCallback;
 //
 exports.inquire = questions => download().then(injectZlib1).then(() => {
     downloader.downloadUrl; // eslint-disable-line no-unused-expressions
@@ -28,12 +29,13 @@ exports.inquireAsync = questions => download().then(injectZlib1).then(() => new 
     const scaffoldWizard = ffi.Library(ENTRY_FILE, {
         inquireAsync: ['void', ['string', 'string', 'string', 'pointer']]
     });
-    const nativeCallback = ffi.Callback('void', ['string', 'string'], finishedBuilder((err, answers) => {
+    nativeCallback = ffi.Callback('void', ['string', 'string'], finishedBuilder((err, answers) => {
         if (err) {
             reject(new Error(err));
         } else {
             resolve(JSON.parse(answers));
         }
+        nativeCallback = null;
     }));
     scaffoldWizard.inquireAsync(reformQuestions(questions), BIN_DIR, ref.NULL_POINTER, nativeCallback);
 }));
