@@ -50,7 +50,7 @@ function reformQuestions(questions){
     return JSON.stringify(q);
 }
 function injectZlib1(){
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         const log = logger('scaffold-wizard:inject-dll');
         log('platform=', os.platform(), 'cpu-arch=', os.arch());
         if (os.platform() === 'win32' && os.arch() === 'x64') {
@@ -60,14 +60,16 @@ function injectZlib1(){
             if (isNodeRunning) {
                 const success = injector.injectPID(process.pid, zlib1);
                 if (success !== 0) {
-                    throw new Error(`${zlib1} 注入失败：${success}, ${process.pid}`);
+                    reject(new Error(`${zlib1} 注入失败：${success}, ${process.pid}`));
+                    return;
                 }
             }
             log('注入', zlib1, '给进程', process.pid);
+            setTimeout(resolve, 0);
         } else {
             log('不需要注入 zlib1');
+            resolve();
         }
-        setTimeout(resolve, 150);
     });
 }
 function finishedBuilder(callback){
