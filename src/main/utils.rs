@@ -141,3 +141,39 @@ impl Unwrap {
         }
     }
 }
+pub static PACKAGE_BLACKLIST: [&str; 2] = ["node_modules", "favicon.ico"];
+pub static PACKAGE_BUILT_IN_NAMES: [&str; 33] = [
+    "assert",
+    "buffer",
+    "child_process",
+    "cluster",
+    "console",
+    "constants",
+    "crypto",
+    "dgram",
+    "dns",
+    "domain",
+    "events",
+    "fs",
+    "http",
+    "https",
+    "module",
+    "net",
+    "os",
+    "path",
+    "process",
+    "punycode",
+    "querystring",
+    "readline",
+    "repl",
+    "stream",
+    "string_decoder",
+    "timers",
+    "tls",
+    "tty",
+    "url",
+    "util",
+    "v8",
+    "vm",
+    "zlib"
+];

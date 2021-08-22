@@ -27,6 +27,7 @@ gtk = {version = "0.9.2", features = ["v3_24"]}
 log = "0.4.14"
 log4rs = {version = "1.0.0", features = ["all_components", "config_parsing", "json_format", "gzip", "background_rotation"]}
 quick-xml = {version = "0.22.0", features = ["encoding_rs"]}
+regex = "1"
 serde_json = {version = "1.0", features = ["preserve_order"]}
 
 [dev-dependencies]

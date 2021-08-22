@@ -18,9 +18,10 @@ use ::gio::ApplicationExt;
 use ::glib::{clone, Value as GtkValue};
 use ::gtk::{ApplicationWindow, Builder, Button, Frame, prelude::*};
 use ::log::debug;
+use ::regex::Regex;
 use ::serde_json::{map::Map, Value as jValue};
 use ::std::{path::PathBuf, cell::RefCell, rc::Rc};
-use super::utils::Unwrap;
+use super::utils::{PACKAGE_BLACKLIST, PACKAGE_BUILT_IN_NAMES, Unwrap};
 pub use prompt_page::draw_page;
 pub use error_dialog::show as err_popup;
 //
@@ -202,11 +203,15 @@ fn validate_page(step_index: usize, data: Rc<Data>, unwrap: Rc<Unwrap>) -> Resul
         }
     } else if q_type == "input" || q_type == "string" {
         let q_type = json["subType"].as_str().unwrap_or_default();
-        if q_type != "port" {
-            let text_answers = answer.as_str().unwrap_or_default();
-            if required && text_answers == "" {
-                return Err("请录入内容".to_string());
-            }
+        if q_type == "port" {
+            return Ok(());
+        }
+        let text_answers = answer.as_str().unwrap_or_default();
+        if required && text_answers == "" {
+            return Err("请录入内容".to_string());
+        }
+        if q_type == "packageName" {
+            validate_package_name(text_answers)?;
         }
     }
     Ok(())
@@ -236,4 +241,36 @@ fn evaluate_when(log_prefix: &str, prompt: &jValue, answers: Rc<RefCell<Map<Stri
     } else {
         true
     }
+}
+fn validate_package_name(package_name: &str) -> Result<(), String> {
+    if package_name == "" {
+        return Err("请录入内容".to_string());
+    }
+    if package_name.contains(".") {
+        return Err("包名内不能含有【点】".to_string());
+    }
+    if package_name.contains(" ") {
+        return Err("包名内不能含有【空格】".to_string());
+    }
+    if package_name.starts_with("_") {
+        return Err("包名内不能以【下划线】开头".to_string());
+    }
+    let re = Regex::new("[~'!()*]").unwrap();
+    if re.is_match(package_name) {
+        return Err("包名内不能含特殊字符".to_string());
+    }
+    if PACKAGE_BLACKLIST.contains(&package_name) {
+        return Err("包名不能是预置文件夹或文件名".to_string());
+    }
+    if PACKAGE_BUILT_IN_NAMES.contains(&package_name.to_lowercase().as_str()) {
+        return Err("包名不能是预置包的包名".to_string());
+    }
+    if package_name.to_lowercase() != package_name {
+        return Err("包名必须都是小写".to_string());
+    }
+    if package_name.len() > 214 {
+        return Err("包名长度必须小于等于 214 个字节".to_string());
+    }
+    //TODO: 未处理【作用域-包名】的情况
+    Ok(())
 }

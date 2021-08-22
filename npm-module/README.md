@@ -256,7 +256,7 @@ export function inquireAsync(questions: Questions): Promise<inquirer.Answers>;
         }]
     },
     "flavor": {
-        "when": "!subprojects.wasm && !subprojects.rust_gui",
+        "when": "subprojects.wasm == false && subprojects.rust_gui == false",
         "type": "confirm",
         "message": "是否支持 Flavor 选择器？",
         "default": false
@@ -399,6 +399,7 @@ export function inquireAsync(questions: Questions): Promise<inquirer.Answers>;
     },
     "name": {
         "type": "string",
+        "subType": "packageName",
         "message": "工程名",
         "required": true,
         "default": "project_name"

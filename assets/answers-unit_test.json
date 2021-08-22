@@ -10,6 +10,7 @@
   "appUiLib": "vant",
   "favicon": true,
   "appMultiEntries": 2,
+  "flavor": true,
   "appAssetsSubDirectory": "static",
   "appWebWorker": true,
   "appI18n": true,

@@ -1201,6 +1201,7 @@ dependencies = [
  "log4rs",
  "mut_static",
  "quick-xml",
+ "regex",
  "serde_json",
 ]
 
