@@ -6,7 +6,7 @@ const logger = require('debug');
 const download = require('download');
 const cliProgress = require('cli-progress');
 //
-const DEFAULT_TAG = 'basic2';
+const DEFAULT_TAG = 'basic3';
 const CACHE_DIR = path.join(os.tmpdir(), 'npm-scaffold-wizard', DEFAULT_TAG);
 //
 exports.CACHE_DIR = CACHE_DIR;
