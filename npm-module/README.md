@@ -310,7 +310,7 @@ export function inquireAsync(questions: Questions): Promise<inquirer.Answers>;
         "default": false
     },
     "imgCompress": {
-        "when": "!subprojects.wasm && !subprojects.rust_gui",
+        "when": "subprojects.wasm == false && subprojects.rust_gui == false",
         "type": "confirm",
         "message": "是否预压缩各类图片？",
         "default": false
