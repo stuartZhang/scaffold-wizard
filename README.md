@@ -80,6 +80,17 @@
 
 鉴于之前使用`rust + wasm`完成【网络加密通讯】功能的踩坑经验，我这次显示地将`package`绑定了适用的`rustup`版本`nightly-2021-03-25-x86_64-pc-windows-gnu`。若你的本地`rustup`安装版本与之不匹配，请根据编译的报错信息，`rustup install ***`正确的`rustup toolchain`版本。就开发环境而言，对非`windows`用户不友好了，实在对不住。
 
+### 工程打开方式
+
+请从`VSCode ->`【文件】`->`【打开工作区】`->`选择文件`.vscode\main.code-workspace`。然后，在【工作区】下有三个子工程
+
+```shell
+.
+├─ rust-gui     # 这是`rust + gnome.gtk3`的原生图形界面开发子工程
+├─ npmjs发布包  # 对应了 npm 包 https://www.npmjs.com/package/scaffold-wizard
+└─ 简单功能演示  # node-ffi 封装的简单演示用例
+```
+
 ### 构建
 
 #### `cargo build`或`cargo build --release`
