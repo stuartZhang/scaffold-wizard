@@ -8,8 +8,12 @@
         "sync": "node index.js",
         "async": "node index.js --async-mode"
     },
-    "os": ["win32"],
-    "cpu": ["x64"],
+    "os": [
+        "win32"
+    ],
+    "cpu": [
+        "x64"
+    ],
     "engines": {
         "node": ">=10"
     },
@@ -23,8 +27,9 @@
     "license": "MIT",
     "dependencies": {
         "ffi": "^2.3.0",
-        "safe-require": "^1.0.4",
-        "node-dll-injector": "^0.2.3"
+        "node-dll-injector": "^0.2.3",
+        "ref": "1",
+        "safe-require": "^1.0.4"
     },
     "devDependencies": {
         "eslint": "^7.20.0",
