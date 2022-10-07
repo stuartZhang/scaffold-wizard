@@ -1,2 +1,2 @@
 [toolchain]
-channel = "nightly-2021-03-25-x86_64-pc-windows-gnu"
+channel = "nightly-x86_64-pc-windows-gnu"

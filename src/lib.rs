@@ -1,4 +1,3 @@
-#![feature(option_insert)]
 mod main;
 
 use ::std::{ffi::CString, os::raw::c_char, path::PathBuf, ptr, thread};

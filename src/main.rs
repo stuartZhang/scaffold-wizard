@@ -60,7 +60,7 @@ fn build_ui(application: &Application, bin_dir: Option<&Path>, q_input: Rc<Quest
             format!("无效输入文件路径：{}", input_file.display()));
         build_ui_core(Rc::clone(&builder), questions_str, Rc::clone(&answers_str), Rc::clone(&bin_dir), Rc::clone(&unwrap));
         let mut a_file_dir = a_file_dir.borrow_mut();
-        a_file_dir.insert(unwrap.option3(input_file.parent().map(|p| p.to_path_buf()),
+        let _ = a_file_dir.insert(unwrap.option3(input_file.parent().map(|p| p.to_path_buf()),
             format!("{} 没有上一级目录", input_file.display())));
     } else if let QuestionsInput::FileText(questions_str) = q_input.borrow() { // 由 dll 调用提供了输入文件的内容
         build_ui_core(Rc::clone(&builder), questions_str, Rc::clone(&answers_str), Rc::clone(&bin_dir), Rc::clone(&unwrap));
@@ -84,7 +84,7 @@ fn build_ui(application: &Application, bin_dir: Option<&Path>, q_input: Rc<Quest
                 build_ui_core(Rc::clone(&builder), questions_str, Rc::clone(&answers_str), Rc::clone(&bin_dir), Rc::clone(&unwrap));
                 file_chooser.hide();
                 let mut a_file_dir = a_file_dir.borrow_mut();
-                a_file_dir.insert(unwrap.option3(input_file.parent().map(|p| p.to_path_buf()),
+                let _ = a_file_dir.insert(unwrap.option3(input_file.parent().map(|p| p.to_path_buf()),
                     format!("{} 没有上一级目录", input_file.display())));
             }
         }

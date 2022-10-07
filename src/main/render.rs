@@ -146,7 +146,7 @@ pub fn connect_signals(builder: &Builder, handler_name: &str, step_count: usize,
                 error_dialog::show(&builder, &message[..]);
             } else {
                 let mut answers_str = answers_str.borrow_mut();
-                answers_str.insert(answers_output);
+                let _ = answers_str.insert(answers_output);
                 if let Some(application) = window.get_application() {
                     application.quit();
                 }

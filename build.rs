@@ -1,4 +1,5 @@
 use ::std::{env, fs, io::Result as IoResult, os, path::{Path, PathBuf}, process};
+use ::cbindgen::{Builder, Config};
 const ASSETS_DIR_NAME: &str = "assets";
 fn main() {
     let out_dir = env::var("OUT_DIR")
@@ -16,6 +17,31 @@ fn main() {
             .expect(&format!("失败：不能从 {} 推断出 {} 目录", out_dir, dir_path)[..]);
         symbolic_link_assets(&exe_dir);
     });
+    generate_cpp_header_file(&out_dir[..]);
+}
+fn generate_cpp_header_file<'a>(out_dir: &'a str) {
+    let cargo_name = env::var("CARGO_PKG_NAME")
+        .expect("失败：环境变量`CARGO_PKG_NAME`未提供");
+    let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR")
+        .expect("失败：环境变量`CARGO_MANIFEST_DIR`未提供");
+    let cbindgen_toml = {
+        let mut p = PathBuf::new();
+        p.push(&cargo_manifest_dir[..]);
+        p.push("cbindgen.toml");
+        p
+    };
+    let c_header = {
+        let mut p = PathBuf::new();
+        p.push(out_dir);
+        p.push(format!("../../../{}.h", cargo_name));
+        p
+    };
+    let config = Config::from_file(cbindgen_toml)
+        .expect("失败：解析`cbindgen.toml`配置文件");
+    Builder::new().with_config(config)
+        .with_crate(&cargo_manifest_dir[..])
+        .generate().expect("失败：生成`Cpp`头文件")
+        .write_to_file(c_header);
 }
 #[cfg(windows)]
 fn symbolic_link_zlib1(exe_dir: &PathBuf) {

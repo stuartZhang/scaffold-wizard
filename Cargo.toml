@@ -34,3 +34,6 @@ serde_json = {version = "1.0", features = ["preserve_order"]}
 async-std = {version = "1.9.0", features = ["unstable"]}
 lazy_static = "1.4.0"
 mut_static = "5.0.0"
+
+[build-dependencies]
+cbindgen = "0.24.3"

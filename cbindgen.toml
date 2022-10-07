@@ -1,0 +1,196 @@
+# cbindgen.toml 模板文件。配置项详细解释请见：https://github.com/eqrion/cbindgen/blob/master/docs.md#cbindgentoml
+# - 输出头文件的语言选择。备选值包括: C / C++ / Cython
+language = "C++"
+############## Options for Wrapping the Contents of the Header #################
+# header = "/* 头文件的【页眉】 */"
+# after_includes = "/* 在`#include`语句块后，插入的文本内容。比如，#define DEFINE_FREEBSD 1 */"
+# autogen_warning = "/* 在头文件中部插入的文本内容。比如，禁止手工修改此头文件。 */"
+# trailer = "/* 头文件的【页脚】 */"
+# - 是否在头文件内添加`cbindgen`版本信息
+include_version = false
+# include_guard = "避免重复导入头文件的 #include 守卫·名"
+# - 是否添加`#pragma once`守卫
+# pragma_once = true
+# namespace = "给被导出的`FFI`接口，在调用端，包装一层【命名空间】"
+# - 给被导出的`FFI`接口，在调用端，包装多层【命名空间】
+namespaces = []
+# - 提供给`using namespace`指令的多层【命名空间】
+using_namespaces = []
+# - 在被生成的头文件内包括的【系统·头文件】导入列表。比如，`#include <stdio>`
+sys_includes = []
+# - 在被生成的头文件内包括的【头文件】导入列表。比如，`#include "my_great_lib.h"`
+includes = []
+# - 是否从被生成的头文件中抹掉所有默认导入语句。
+no_includes = false
+# - 是否生成兼容于`C++`的`C`头文件。
+cpp_compat = false
+############################ Code Style Options ################################
+# - 花括号的位置。备选值："SameLine", "NextLine"
+braces = "SameLine"
+line_length = 100
+tab_width = 2
+# - 换行符。备选值：CR, CRLF, Native, LF
+line_endings = "LF"
+# - 是否保留`rust`端的【文档·注释】
+documentation = true
+# - 【文档·注释】的格式。备选值：c, c99, c++, doxy, auto
+documentation_style = "auto"
+# - 【文档·注释】保留内容的多少。备选值：short, full
+documentation_length = "full"
+############################# Codegen Options ##################################
+# - 声明结构体的代码风格。备选值：type, tag, both
+style = "both"
+# - 对`[fn] sort_by`和`[const] sort_by`配置项的默认值
+# sort_by = "None"
+# - `usize`和`isize`的类型转译
+# - * true:  usize -> size_t;    isize -> ptrdiff_t
+# - * false: usize -> uintptr_t; isize -> intptr_t
+usize_is_size_t = true
+# - `Rust`代码中的【编译·条件`#[cfg(...)]`】会被转译为`C/C++`代码中的【`#if defined(...)`元编程】
+[defines]
+# "target_os = freebsd" = "DEFINE_FREEBSD"
+# "feature = serde" = "DEFINE_SERDE"
+[export]
+include = []
+# - 只有指定类型的项才会被转译与收拢入头文件内。备选值：constants, globals, enums, structs, unions, typedefs, opaque, functions
+item_types = []
+exclude = []
+# prefix = "给每个`FFI`导出项添加的前缀字符串"
+# - * true:  仅重命名，不前缀化
+# - * false: 先重命名，再前缀化
+renaming_overrides_prefixing = false
+[export.rename]
+# "旧名" = "新名"
+[export.pre_body]
+# "struct/union/enum 的类型名" = """
+#    在定义体·前·插入的文本内容。可被用来添加额外的成员方法，或标记某些字段为【私有】。
+# """
+[export.body]
+# "struct/union/enum 的类型名" = """
+#     在定义体·后·追加的文本内容。可被用来添加额外的成员方法。
+# """
+[export.mangle]
+# - 如何混淆类型名
+rename_types = "None"
+# - 是否抹掉被混淆后各种名称中的`_`字符。
+remove_underscores = false
+[layout]
+# - `#[repr(packed)]`类型名·在头文件中·的前缀字符串。就`c/c++`而言，`__attribute__((packed))`是很合理的。或者是生成该前缀的宏调用。
+packed = ""
+# - `#[repr(align(n))]`类型名·在头文件中·的前缀字符串。就`c/c++`而言，`__attribute__((aligned(n)))`是很合理的。或者是生成该前缀的宏调用。
+aligned_n = ""
+[fn]
+# - 重命名函数形参名的方式。备选值：CamelCase, PascalCase（首字母大写的 CamelCase）, GeckoCase, SnakeCase, ScreamingSnakeCase（全大写的 Snake_Case）, None
+rename_args = "None"
+# - `#[must_use]`函数名·在头文件中·的前缀字符串。就`c/c++`而言，`__attribute__((warn_unused_result))`是很合理的。或者是生成该前缀的宏调用。
+must_use = ""
+# - `diverging function`函数名·在头文件中·的前缀字符串。就`c/c++`而言，`__attribute__((noreturn))`是很合理的。或者是生成该前缀的宏调用。
+no_return = ""
+# - 所有函数的函数名·前·缀字符串
+prefix = ""
+# - 所有函数的函数名·后·缀字符串
+postfix = ""
+# - 函数形参列表的排列方式。备选值：horizontal, vertical, auto
+args = "auto"
+# - 宏名称。`Swift`编译器会调用此宏来给函数生成`swift`
+# swift_name_macro = "CF_SWIFT_NAME"
+# - 函数排序规则。备选值：Name（按函数名排序）, None（按解析次序排序）
+sort_by = "None"
+[struct]
+# - 重命名字段名的方式。备选值：CamelCase, PascalCase（首字母大写的 CamelCase）, GeckoCase, SnakeCase, ScreamingSnakeCase（全大写的 Snake_Case）, None
+rename_fields = "None"
+# - `#[must_use]`结构体名·在头文件中·的前缀字符串。就`c/c++`而言，`__attribute__((warn_unused))`是很合理的。或者是生成该前缀的宏调用。
+must_use = ""
+# - 结构体内定义的【关联·常量】，在头文件内，
+# - * true:  仍定义于结构体内。
+# - * false: 在结构体定义块之后，以`结构体名_原关联常量名`的方式输出。要求`[const]allow_static_const`是`true`且`language`不是`C`。
+associated_constants_in_body = false
+# - 为结构体·生成一个构造函数
+derive_constructor = false
+# - 为结构体·重载【等号】操作符。
+derive_eq = false
+# - 为结构体·重载【不等号】操作符。
+derive_neq = false
+# - 为结构体·重载【小于号】操作符。
+derive_lt = false
+# - 为结构体·重载【小于等于号】操作符。
+derive_lte = false
+# - 为结构体·重载【大于号】操作符。
+derive_gt = false
+# - 为结构体·重载【大于等于号】操作符。
+derive_gte = false
+[enum]
+# - 若`language`是`C++`，是否使用`enum class`语法定义枚举类
+enum_class = true
+# - 重命名【枚举值】与【枚举值·字段名】的方式。备选值：
+# - CamelCase, PascalCase（首字母大写的 CamelCase）,
+# - SnakeCase, ScreamingSnakeCase（全大写的 Snake_Case）, QualifiedScreamingSnakeCase（添加`ENUM_`前缀的 ScreamingSnakeCase）,
+# - LowerCase, UpperCase, None
+rename_variants = "None"
+# - `#[must_use]`枚举类名·在头文件中·的前缀字符串。就`c/c++`而言，`__attribute__((warn_unused))`是很合理的。或者是生成该前缀的宏调用。
+# - 其对有字段枚举类无效。
+must_use = ""
+# - 是否给【枚举类】额外添加【哨兵（无字段）】枚举值
+add_sentinel = false
+# - 是否以【枚举类】名为前缀，重命名【枚举值】名。
+prefix_with_name = false
+# - 是否为【有字段·枚举类】生成额外的辅助成员方法。比如，【枚举值·构造函数】与【枚举值·判断方法】`is枚举值名()`。
+derive_helper_methods = false
+# - 是否为【有字段·枚举类】生成额外的辅助成员方法。比如，`const MyVariant& AsMyVariant() const`。
+derive_const_casts = false
+# - 是否为【有字段·枚举类】生成额外的辅助成员方法。比如，`MyVariant& AsMyVariant()`。
+derive_mut_casts = false
+# - 在`AsMyVariant()`中，断言【枚举值】的断言函数名。
+# cast_assert_name = "assert"
+# - 是否给【有字段·枚举类】生成【析构函数】。危险！
+derive_tagged_enum_destructor = false
+# - 是否给【有字段·枚举类】生成【复制·构造函数】。危险！
+derive_tagged_enum_copy_constructor = false
+# - 若`derive_tagged_enum_copy_constructor`是`true`，则推荐将该配置项也设置为`true`。危险！
+derive_tagged_enum_copy_assignment = false
+# - 是否给【有字段·枚举类】生成私有的、空的【析构函数】。危险！
+private_default_tagged_enum_constructor = false
+[const]
+# - 若`language`是`C++`，把常量转译成`C++`静态常量。
+allow_static_const = true
+# - 若`language`是`C++`，是否接受常量表达式。
+allow_constexpr = false
+# - 常量排序规则。备选值：Name（按常量名排序）, None（按解析次序排序）
+sort_by = "Name"
+[macro_expansion]
+# - 是否支持`rust`端的`bitflags!`宏。
+bitflags = false
+############## Options for How Your Rust library Should Be Parsed ##############
+[parse]
+# - 是否将`rust`源码静态分析的范围从`Cargo Package`自身扩展至他的所有依赖工程。
+parse_deps = false
+# - 有限扩展`rust`源码静态分析的范围至被指定的依赖项
+# include = []
+# - 有限扩展`rust`源码静态分析的范围至未被明确指定的所有依赖项
+exclude = []
+# - 是否启用【临时`target`目录】来保存`rust`源码静态分析的中间结果。
+clean = false
+# - 除了`Cargo Package`自身，头文件里还需要包含哪些（依赖）`crate`的导出`C API`。
+extra_bindings = []
+[parse.expand]
+# - 有限扩展`rust`【宏】静态分析的范围至被指定的依赖项
+crates = []
+# - 若未显示地指定`features`配置项且该配置项被设置为`true`，那么执行`cargo expand`会携带`--all-features`参数。
+all_features = false
+# - 若`all_features`与`default_features`都被设置为`false`且未显示地指定`features`配置项，那么执行`cargo expand`会携带`--no-default-features`参数。
+default_features = true
+# - 显示地指定`cargo expand`命令的`--features`参数。这里的指定的`feature`一定是`Cargo Package`自己的`feature`，而不是依赖项的`feature`。
+# - 但是，`Cargo Package`的`feature`可以级联传导开启依赖项的`feature`。
+features = []
+[ptr]
+# - 【非空·指针】名的前缀
+# - * `rust`端的`&T`                   -> C++ 端的【可空指针】
+# - * `rust`端的`&mut T`和`NonNull<T>` -> C++ 端的【非空指针】
+non_null_attribute = ""
+############## Options specific to Cython bindings ##############
+[cython]
+# 由最外层`cdef extern from header:`指定的头
+header = '*'
+# - 使用`from module cimport name1, name2`为指定的依赖添加`import`语句
+[cython.cimports]
+module = []
