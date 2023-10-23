@@ -1,9 +1,8 @@
 const os = require('os');
-const ref = require('ref');
-const ffi = require('ffi');
+const ffi = require('ffi-napi');
 const path = require('path');
 const logger = require('debug');
-const injector = require('node-dll-injector');
+const injector = require('dll-inject');
 const downloader = require('./download');
 //
 const {CACHE_DIR, download} = downloader;
@@ -19,7 +18,7 @@ exports.inquire = questions => download().then(injectZlib1).then(() => {
     const scaffoldWizard = ffi.Library(ENTRY_FILE, {
         inquire: ['string', ['string', 'string', 'string']]
     });
-    return JSON.parse(scaffoldWizard.inquire(reformQuestions(questions), BIN_DIR, ref.NULL_POINTER));
+    return JSON.parse(scaffoldWizard.inquire(reformQuestions(questions), BIN_DIR, ffi.types.NULL_POINTER));
 });
 exports.inquireAsync = questions => download().then(injectZlib1).then(() => new Promise((resolve, reject) => {
     downloader.downloadUrl; // eslint-disable-line no-unused-expressions
@@ -37,7 +36,7 @@ exports.inquireAsync = questions => download().then(injectZlib1).then(() => new 
         }
         nativeCallback = null;
     }));
-    scaffoldWizard.inquireAsync(reformQuestions(questions), BIN_DIR, ref.NULL_POINTER, nativeCallback);
+    scaffoldWizard.inquireAsync(reformQuestions(questions), BIN_DIR, ffi.types.NULL_POINTER, nativeCallback);
 }));
 function reformQuestions(questions){
     let q = questions;
