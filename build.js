@@ -38,17 +38,20 @@ const targetDir = path.resolve(__dirname, 'target');
     await buildLib();
 })();
 async function buildLib(){
-    const dllFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', 'scaffold_wizard.dll');
+    const prefix = process.platform === 'darwin' ? 'lib' : '';
+    const extName = process.platform === 'darwin' ? '.dylib' : '.dll';
+    const dllFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', `${prefix}scaffold_wizard${extName}`);
     const zipFile = path.join(targetDir, 'scaffold-wizard.setup-lib.zip');
     const setupDir = path.join(targetDir, 'setup-lib');
-    const setupDllFile = path.join(setupDir, 'bin', 'scaffold_wizard.dll');
+    const setupDllFile = path.join(setupDir, 'bin', `${prefix}scaffold_wizard${extName}`);
     await build(setupDir, zipFile, dllFile, setupDllFile);
 }
 async function buildBin(){
-    const exeFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', 'scaffold-wizard.exe');
+    const extName = process.platform === 'win32' ? '.exe' : '';
+    const exeFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', `scaffold-wizard${extName}`);
     const zipFile = path.join(targetDir, 'scaffold-wizard.setup-bin.zip');
     const setupDir = path.join(targetDir, 'setup-bin');
-    const setupExeFile = path.join(setupDir, 'bin', 'scaffold-wizard.exe');
+    const setupExeFile = path.join(setupDir, 'bin', `scaffold-wizard${extName}`);
     await build(setupDir, zipFile, exeFile, setupExeFile);
 }
 async function build(setupDir, zipFile, exeFile, setupExeFile){

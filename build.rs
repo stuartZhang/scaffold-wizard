@@ -94,22 +94,26 @@ fn symbolic_link_assets(exe_dir: &PathBuf) {
     assets_origin.push(ASSETS_DIR_NAME);
     let assets_symbol = exe_dir.join(ASSETS_DIR_NAME);
     if assets_symbol.exists() {
-        fs::remove_dir(assets_symbol.clone())
+        remove_link(assets_symbol.clone())
             .expect(&format!("失败：不能删除原来的 {} 符号链接文件", assets_symbol.display())[..]);
     }
     make_link(&assets_origin, &assets_symbol)
         .expect(&format!("失败：不能创建文件链接 {} 指向 {}", assets_symbol.display(), assets_origin.display())[..]);
     println!("成功：能创建目录链接 {} 指向 {}", assets_symbol.display(), assets_origin.display());
-    #[cfg(windows)]
-    fn make_link(assets_origin: &PathBuf, assets_symbol: &PathBuf) -> IoResult<()> {
-        os::windows::fs::symlink_dir(assets_origin.clone(), assets_symbol.clone())
+    fn remove_link(assets_symbol: PathBuf) -> IoResult<()> {
+        #[cfg(windows)]
+        let result = fs::remove_dir(assets_symbol);
+        #[cfg(not(windows))]
+        let result = fs::remove_file(assets_symbol);
+        result
     }
-    #[cfg(unix)]
     fn make_link(assets_origin: &PathBuf, assets_symbol: &PathBuf) -> IoResult<()> {
-        os::unix::fs::symlink(assets_origin.clone(), assets_symbol.clone())
-    }
-    #[cfg(linux)]
-    fn make_link(assets_origin: &PathBuf, assets_symbol: &PathBuf) -> IoResult<()> {
-        os::linux::fs::symlink(assets_origin.clone(), assets_symbol.clone())
+        #[cfg(windows)]
+        let result = os::windows::fs::symlink_dir(assets_origin.clone(), assets_symbol.clone());
+        #[cfg(unix)]
+        let result = os::unix::fs::symlink(assets_origin.clone(), assets_symbol.clone());
+        #[cfg(linux)]
+        let result = os::linux::fs::symlink(assets_origin.clone(), assets_symbol.clone());
+        result
     }
 }
