@@ -26,10 +26,11 @@
     "author": "stuart_zhang",
     "license": "MIT",
     "dependencies": {
-        "ffi": "^2.3.0",
-        "node-dll-injector": "^0.2.3",
-        "ref": "1",
+        "ffi-napi": "^2.5.0",
         "safe-require": "^1.0.4"
+    },
+    "optionalDependencies": {
+        "dll-inject": "^0.0.3"
     },
     "devDependencies": {
         "eslint": "^7.20.0",

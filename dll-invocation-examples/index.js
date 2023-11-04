@@ -1,19 +1,19 @@
 const fs = require('fs');
-const ref = require('ref');
-const ffi = require('ffi');
+const ffi = require('ffi-napi');
 const util = require('util');
 const path = require('path');
 const os = require('os');
 const safeRequire = require('safe-require');
+const {dyLibFullName} = require('../npm-module/utils');
 //
 const readFile = util.promisify(fs.readFile);
 //
 const homeDir = path.resolve(__dirname, '../target/setup-lib');
 const isAsync = ~process.argv.indexOf('--async-mode');
+const dllFile = path.join(homeDir, 'bin', dyLibFullName);
+const dllDir = path.dirname(dllFile);
 //
 (async () => {
-    const dllFile = path.join(homeDir, 'bin/scaffold_wizard.dll');
-    const dllDir = path.dirname(dllFile);
     if (os.platform() === 'win32' && os.arch() === 'x64') {
         const injector = safeRequire('node-dll-injector');
         if (injector) {
@@ -35,9 +35,9 @@ const isAsync = ~process.argv.indexOf('--async-mode');
         inquireAsync: ['void', ['string', 'string', 'string', 'pointer']]
     });
     if (isAsync) {
-        scaffoldWizard.inquireAsync(questions, dllDir, ref.NULL_POINTER, ffi.Callback('void', ['string', 'string'], finishedBuilder(finished)));
+        scaffoldWizard.inquireAsync(questions, dllDir, ffi.types.NULL_POINTER, ffi.Callback('void', ['string', 'string'], finishedBuilder(finished)));
     } else {
-        finished(null, scaffoldWizard.inquire(questions, dllDir, ref.NULL_POINTER));
+        finished(null, scaffoldWizard.inquire(questions, dllDir, ffi.types.NULL_POINTER));
     }
     function finished(err, answers){
         if (err == null) {

@@ -18,11 +18,13 @@ dependencies:
   chalk: 4.1.2
   cli-progress: 3.9.1
   debug: 4.3.2
-  dll-inject: 0.0.3
   download: 8.0.0
   ffi-napi: 2.5.0
   fs-extra: 9.1.0
   safe-require: 1.0.4
+
+optionalDependencies:
+  dll-inject: 0.0.3
 
 devDependencies:
   eslint: 7.32.0
@@ -464,6 +466,7 @@ packages:
     dependencies:
       file-uri-to-path: 1.0.0
     dev: false
+    optional: true
 
   /bl/1.2.3:
     resolution: {integrity: sha1-Ho3YAULqyA1xWMnczAR/tiDgNec=}
@@ -912,6 +915,7 @@ packages:
       bindings: 1.5.0
       nan: 2.18.0
     dev: false
+    optional: true
 
   /doctrine/2.1.0:
     resolution: {integrity: sha1-XNAfwQFiG0LEzX9dGmYkNxbT850=}
@@ -1485,6 +1489,7 @@ packages:
   /file-uri-to-path/1.0.0:
     resolution: {integrity: sha1-VTp7hEb/b2hDWcRF8eN6BdrMM90=}
     dev: false
+    optional: true
 
   /filename-reserved-regex/2.0.0:
     resolution: {integrity: sha1-q/c9+rc10EVECr/qLZHzieu/oik=}
@@ -2143,6 +2148,7 @@ packages:
   /nan/2.18.0:
     resolution: {integrity: sha512-W7tfG7vMOGtD30sHoZSSc/JVYiyDPEyQVso/Zz+/uQd0B0L46gtC+pHha5FFMRpil6fm/AoEcRWyOVi4+E/f8w==}
     dev: false
+    optional: true
 
   /natural-compare/1.4.0:
     resolution: {integrity: sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=}

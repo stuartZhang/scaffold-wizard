@@ -4,6 +4,7 @@ const path = require('path');
 const util = require('util');
 const archiver = require_('archiver');
 const {exec} = require('child_process');
+const {binFullName, dyLibFullName} = require('./npm-module/utils');
 
 const lStat = util.promisify(fs.lstat);
 const mkdir = util.promisify(fs.mkdir);
@@ -15,8 +16,9 @@ const copyFile = util.promisify(fs.copyFile);
 
 const isRelease = ~process.argv.indexOf('--release');
 const assetsDir = path.resolve(__dirname, 'assets');
-const boilerplate = path.resolve(__dirname, '.boilerplate');
+const boilerplate = path.resolve(__dirname, path.join('.boilerplate', process.platform));
 const targetDir = path.resolve(__dirname, 'target');
+const targetTriple = `${process.platform}-${process.arch}`;
 
 (async () => {
     const command = `cargo build ${process.argv.slice(2).join(' ')}`;
@@ -38,20 +40,17 @@ const targetDir = path.resolve(__dirname, 'target');
     await buildLib();
 })();
 async function buildLib(){
-    const prefix = process.platform === 'darwin' ? 'lib' : '';
-    const extName = process.platform === 'darwin' ? '.dylib' : '.dll';
-    const dllFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', `${prefix}scaffold_wizard${extName}`);
-    const zipFile = path.join(targetDir, 'scaffold-wizard.setup-lib.zip');
+    const dllFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', dyLibFullName);
+    const zipFile = path.join(targetDir, `scaffold-wizard.setup-lib.${targetTriple}.zip`);
     const setupDir = path.join(targetDir, 'setup-lib');
-    const setupDllFile = path.join(setupDir, 'bin', `${prefix}scaffold_wizard${extName}`);
+    const setupDllFile = path.join(setupDir, 'bin', dyLibFullName);
     await build(setupDir, zipFile, dllFile, setupDllFile);
 }
 async function buildBin(){
-    const extName = process.platform === 'win32' ? '.exe' : '';
-    const exeFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', `scaffold-wizard${extName}`);
-    const zipFile = path.join(targetDir, 'scaffold-wizard.setup-bin.zip');
+    const exeFile = path.join(__dirname, 'target', isRelease ? 'release' : 'debug', binFullName);
+    const zipFile = path.join(targetDir, `scaffold-wizard.setup-bin.${targetTriple}.zip`);
     const setupDir = path.join(targetDir, 'setup-bin');
-    const setupExeFile = path.join(setupDir, 'bin', `scaffold-wizard${extName}`);
+    const setupExeFile = path.join(setupDir, 'bin', binFullName);
     await build(setupDir, zipFile, exeFile, setupExeFile);
 }
 async function build(setupDir, zipFile, exeFile, setupExeFile){
@@ -65,8 +64,10 @@ async function build(setupDir, zipFile, exeFile, setupExeFile){
     }
     console.info('创建', setupDir, '目录');
     await mkdir(setupDir);
-    console.info('复制依赖 dll、资源文件、配置文件');
-    await copyDir(boilerplate, setupDir);
+    if (await fileExists(boilerplate)) {
+        console.info('复制依赖 dll、资源文件、配置文件');
+        await copyDir(boilerplate, setupDir);
+    }
     await copyFile(exeFile, setupExeFile);
     await mkdir(setupAssetsDir);
     await copyDir(assetsDir, setupAssetsDir);
@@ -115,7 +116,7 @@ async function copyDir(source, target){
     }
 }
 async function removeDir(dir){
-    if (await access(dir, fs.constants.F_OK).then(() => true, () => false)) {
+    if (await fileExists(dir)) {
         const items = await readDir(dir);
         if (items.length > 0) {
             await Promise.all(items.map(async item => {
@@ -131,6 +132,9 @@ async function removeDir(dir){
             await rmDir(dir)
         }
     }
+}
+function fileExists(filePath){
+    return access(filePath, fs.constants.F_OK).then(() => true, () => false);
 }
 function require_(name){
     try {

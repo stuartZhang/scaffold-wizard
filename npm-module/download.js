@@ -1,13 +1,12 @@
-const os = require('os');
 const path = require('path');
 const fs = require('fs-extra');
 const chalk = require('chalk');
 const logger = require('debug');
 const download = require('download');
 const cliProgress = require('cli-progress');
+const {dyLibFullName: LIB_FULL_NAME, defaultTag: DEFAULT_TAG, targetTriple} = require('./utils');
 //
-const DEFAULT_TAG = 'basic3';
-const CACHE_DIR = path.join(os.tmpdir(), 'npm-scaffold-wizard', DEFAULT_TAG);
+const CACHE_DIR = path.join(tmpDir(), 'npm-scaffold-wizard', DEFAULT_TAG);
 //
 exports.CACHE_DIR = CACHE_DIR;
 exports.DEFAULT_TAG = DEFAULT_TAG;
@@ -15,10 +14,15 @@ Reflect.defineProperty(exports, 'downloadUrl', {
     enumerable: true,
     configurable: false,
     get(){
-        if (os.platform() === 'win32' && os.arch() === 'x64') {
-            return `https://github.com/stuartZhang/scaffold-wizard/releases/download/${DEFAULT_TAG}/scaffold-wizard.setup-lib.zip`;
+        if (process.arch === 'x64') {
+            if (process.platform === 'win32') {
+                return `https://github.com/stuartZhang/scaffold-wizard/releases/download/${DEFAULT_TAG}/scaffold-wizard.setup-lib.zip`;
+            }
+            if (process.platform === 'darwin') {
+                return `https://github.com/stuartZhang/scaffold-wizard/releases/download/${DEFAULT_TAG}/scaffold-wizard.setup-lib.${targetTriple}.zip`;
+            }
         }
-        throw new Error(`没有与'${os.platform()}_${os.arch()}'操作系统相配的图形界面程序包`);
+        throw new Error(`没有与'${process.platform}_${process.arch}'操作系统相配的图形界面程序包`);
     }
 });
 exports.download = async function(){
@@ -64,10 +68,11 @@ exports.download = async function(){
 };
 async function checkCacheDir(){
     if (await fs.exists(CACHE_DIR) && (await fs.stat(CACHE_DIR)).isDirectory()) {
-        return Promise.all([
-            path.join(CACHE_DIR, 'bin/scaffold_wizard.dll'),
-            path.join(CACHE_DIR, 'bin/zlib1.dll')
-        ].map(dllPath => fs.exists(dllPath).then(exist => {
+        const filePaths = [path.join(CACHE_DIR, 'bin', LIB_FULL_NAME)];
+        if (process.platform === 'win32') {
+            filePaths.push(path.join(CACHE_DIR, 'bin/zlib1.dll'));
+        }
+        return Promise.all(filePaths.map(dllPath => fs.exists(dllPath).then(exist => {
             if (exist) {
                 return fs.stat(dllPath).then(stats => stats.isFile());
             }
@@ -75,4 +80,11 @@ async function checkCacheDir(){
         }))).then(results => results.every(result => result));
     }
     return false;
+}
+function tmpDir(){
+    if (process.env.TMPDIR) {
+        return process.env.TMPDIR;
+    }
+    const os = require('os');
+    return os.tmpdir();
 }

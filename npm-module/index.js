@@ -1,60 +1,63 @@
-const os = require('os');
-const ffi = require('ffi-napi');
 const path = require('path');
 const logger = require('debug');
-const injector = require('dll-inject');
 const downloader = require('./download');
 //
 const {CACHE_DIR, download} = downloader;
-const BIN_DIR = path.join(CACHE_DIR, 'bin');
-const ENTRY_FILE = path.join(BIN_DIR, 'scaffold_wizard.dll');
-let nativeCallback;
-//
 exports.inquire = questions => download().then(injectZlib1).then(() => {
-    downloader.downloadUrl; // eslint-disable-line no-unused-expressions
-    const log = logger('scaffold-wizard:inquire');
-    log('BIN_DIR=', BIN_DIR);
-    log('ENTRY_FILE=', ENTRY_FILE);
-    const scaffoldWizard = ffi.Library(ENTRY_FILE, {
-        inquire: ['string', ['string', 'string', 'string']]
-    });
-    return JSON.parse(scaffoldWizard.inquire(reformQuestions(questions), BIN_DIR, ffi.types.NULL_POINTER));
-});
-exports.inquireAsync = questions => download().then(injectZlib1).then(() => new Promise((resolve, reject) => {
-    downloader.downloadUrl; // eslint-disable-line no-unused-expressions
-    const log = logger('scaffold-wizard:inquire');
-    log('BIN_DIR=', BIN_DIR);
-    log('ENTRY_FILE=', ENTRY_FILE);
-    const scaffoldWizard = ffi.Library(ENTRY_FILE, {
-        inquireAsync: ['void', ['string', 'string', 'string', 'pointer']]
-    });
-    nativeCallback = ffi.Callback('void', ['string', 'string'], finishedBuilder((err, answers) => {
-        if (err) {
-            reject(new Error(err));
-        } else {
-            resolve(JSON.parse(answers));
-        }
-        nativeCallback = null;
-    }));
-    scaffoldWizard.inquireAsync(reformQuestions(questions), BIN_DIR, ffi.types.NULL_POINTER, nativeCallback);
-}));
-function reformQuestions(questions){
-    let q = questions;
-    if (typeof q === 'string') {
-        q = JSON.parse(q);
+    if (process.platform === 'darwin') {
+        return new Promise((resolve, reject) => {
+            let isKilled = false;
+            const child = require('child_process').fork(path.join(__dirname, 'engine.js'), {
+                env: {
+                    ...process.env,
+                    DYLD_LIBRARY_PATH: `${CACHE_DIR}/lib:${process.env.DYLD_LIBRARY_PATH}`
+                }
+            });
+            child.on('close', code => {
+                isKilled = true;
+                if (code === 0) {
+                    resolve();
+                } else {
+                    reject(new Error('子进程执行失败'));
+                }
+            });
+            child.on('error', err => {
+                if (!isKilled) {
+                    child.kill();
+                }
+                reject(err);
+            });
+            child.on('message', message => {
+                if (!isKilled) {
+                    child.kill();
+                }
+                if (message.type === 'success') {
+                    resolve(message.data);
+                } else {
+                    reject(message.data || message);
+                }
+            });
+            child.send({
+                action: 'questions',
+                data: questions
+            });
+        });
     }
-    q = {
-        prompts: q
-    };
-    return JSON.stringify(q);
+    return require('./engine').inquire(questions);
+});
+if (process.platform === 'darwin') {
+    exports.inquireAsync = exports.inquire;
+} else {
+    exports.inquireAsync = questions => download().then(injectZlib1).then(() => require('./engine').inquireAsync(questions));
 }
 function injectZlib1(){
     return new Promise((resolve, reject) => {
         const log = logger('scaffold-wizard:inject-dll');
-        log('platform=', os.platform(), 'cpu-arch=', os.arch());
-        if (os.platform() === 'win32' && os.arch() === 'x64') {
+        log('platform=', process.platform, 'cpu-arch=', process.arch);
+        if (process.platform === 'win32' && process.arch === 'x64') {
             const zlib1 = path.join(CACHE_DIR, 'bin/zlib1.dll');
             log('zlib1=', zlib1, 'process-id=', process.pid);
+            const injector = require('dll-inject');
             const isNodeRunning = injector.isProcessRunningPID(process.pid);
             if (isNodeRunning) {
                 const success = injector.injectPID(process.pid, zlib1);
@@ -70,15 +73,4 @@ function injectZlib1(){
             resolve();
         }
     });
-}
-function finishedBuilder(callback){
-    let timerId;
-    const holding = () => {
-        timerId = setTimeout(holding, 1000 * 60 * 60 * 24);
-    };
-    holding();
-    return (err, answers) => {
-        clearTimeout(timerId);
-        return callback(err, answers);
-    };
 }
