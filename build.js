@@ -36,6 +36,7 @@ const targetTriple = `${process.platform}-${process.arch}`;
             resolve(stdOut);
         }
     }));
+    // await collectDyLibDeps();
     await buildBin();
     await buildLib();
 })();
@@ -143,4 +144,57 @@ function require_(name){
         console.error('请【全局】安装', name);
         return null;
     }
+}
+async function collectDyLibDeps(pkgName = 'gtk+3', handledPkgNames = []){
+    if (process.platform !== 'darwin') {
+        return;
+    }
+    const filePaths = await execute(`brew ls -v ${pkgName}`);
+    const pairs = filePaths.split(/\n/).map(filePath => filePath.trim()).filter(filePath => {
+        return !!filePath && !filePath.startsWith(`/usr/local/Cellar/${filePath}/`);
+    }).filter(filePath => {
+        const middleFragment = filePath.split(/\//).splice(6, 2);
+        if (['bin', 'lib'].includes(middleFragment[0])) {
+            return true;
+        }
+        if (middleFragment[0] === 'share') {
+            if (['man', 'locale'].includes(middleFragment[1])) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }).map(filePath => {
+        return [filePath, path.join(__dirname, '.boilerplate/darwin', filePath.split(/\//).slice(6).join('/'))];
+    });
+    for (const [source, dest] of pairs) {
+       await execute(`mkdir -p ${path.dirname(dest)}`);
+       try {
+            await execute(`cp -R -L -f ${source} ${dest}`);
+       } catch {
+            console.error(`sudo cp ${source} ${dest}`);
+       }
+    }
+    // 寻找全部依赖项。
+    let pkgNames = await execute(`brew deps --installed ${pkgName}`);
+    pkgNames = pkgNames.split(/\n/).map(pkgName => pkgName.trim()).filter(pkgName => !!pkgName);
+    for (const pkgName of pkgNames) {
+        if (handledPkgNames.includes(pkgName)) {
+            continue;
+        }
+        handledPkgNames.push(pkgName);
+        console.log(pkgName);
+        await collectDyLibDeps(pkgName, handledPkgNames);
+    }
+}
+function execute(command){
+    return new Promise((resolve, reject) => exec(command, {windowsHide: true}, (err, stdOut, stdErr) => {
+        if (err) {
+            reject(err);
+        } else if (stdErr) {
+            resolve(stdOut);
+        } else {
+            resolve(stdOut);
+        }
+    }));
 }
