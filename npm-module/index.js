@@ -1,10 +1,18 @@
+const os = require('os');
 const path = require('path');
 const logger = require('debug');
 const downloader = require('./download');
 //
 const {CACHE_DIR, download} = downloader;
-exports.inquire = questions => download().then(injectZlib1).then(() => {
-    if (process.platform === 'darwin') {
+
+exports.inquire = questions => {
+    if (!os.cpus()[0].model.includes('Intel')) {
+        return Promise.reject(new Error(`尚不支持 ${os.cpus()[0].model}`));
+    }
+    return download().then(injectZlib1).then(() => {
+        if (process.platform !== 'darwin') {
+            return require('./engine').inquire(questions);
+        }
         return new Promise((resolve, reject) => {
             let isKilled = false;
             const child = require('child_process').fork(path.join(__dirname, 'engine.js'), {
@@ -42,9 +50,8 @@ exports.inquire = questions => download().then(injectZlib1).then(() => {
                 data: questions
             });
         });
-    }
-    return require('./engine').inquire(questions);
-});
+    });
+};
 if (process.platform === 'darwin') {
     exports.inquireAsync = exports.inquire;
 } else {
